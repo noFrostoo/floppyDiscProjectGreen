@@ -16,6 +16,11 @@ public class GridCombatSystem : MonoBehaviour
     void Start()
     {
         grid = new Grid<CombatSystem.GridObject>(10, 20, 1f, new Vector3(-13, -6), (Grid<CombatSystem.GridObject> g, int x, int y) => new CombatSystem.GridObject(g, x, y), debug );
+
+    }
+
+    void SetUp()
+    {
         foreach(var gridcell in grid.InOrderIteration())
         {
             //updateIdleCell(gridcell);
@@ -24,7 +29,6 @@ public class GridCombatSystem : MonoBehaviour
         activeCellGameObject = Instantiate(activeCellSprite, new Vector3(0,0,0), activeCellSprite.transform.rotation);
         activeCellGameObject.SetActive(false);
     }
-
     // Update is called once per frame
     void Update()
     {
@@ -40,6 +44,7 @@ public class GridCombatSystem : MonoBehaviour
         {
             activeCellGameObject.SetActive(true); //ToDO if there is a way to active state test if one if is faster then this
             activeCellGameObject.transform.position = currentActiveCell.GetCellPos();
+            
         }
     }
 

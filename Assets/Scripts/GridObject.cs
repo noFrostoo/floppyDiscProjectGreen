@@ -37,14 +37,14 @@ public class GridObject
         return x.ToString() + " " + y.ToString();
     }
 
-    public void setIdleCellSprite(GameObject sprite)
-    {
-        idleCellSprite = sprite;
-    }
-
     public Vector3 GetCellPos()
     {
         return grid.GetWorldPos(x, y) + new Vector3(grid.GetCellSize(), grid.GetCellSize()) * .5f;
+    }
+
+    public void setIdleCellSprite(GameObject sprite)
+    {
+        idleCellSprite = sprite;
     }
 
     public void setActiveCellSprite(GameObject sprite)
