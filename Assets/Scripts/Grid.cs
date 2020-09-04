@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+namespace FloppyDiscProjectGreen
+{
 namespace CombatSystem
 {
 public class Grid<TypeGridObject>
@@ -142,5 +144,6 @@ public class Grid<TypeGridObject>
             textMesh.GetComponent<MeshRenderer>().sortingOrder = 5000;
             return textMesh;
         }
+}
 }
 }

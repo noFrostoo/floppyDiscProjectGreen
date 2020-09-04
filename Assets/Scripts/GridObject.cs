@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+namespace FloppyDiscProjectGreen
+{
 namespace CombatSystem
 {
 public class GridObject
@@ -61,5 +63,6 @@ public class GridObject
     {
         return activeCellSprite;
     }
+}
 }
 }
