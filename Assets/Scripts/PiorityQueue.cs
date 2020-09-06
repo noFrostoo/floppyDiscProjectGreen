@@ -136,6 +136,11 @@ public class PiorityQueueHeap<T> where T : IComparable<T>
 
     }
 
+    public bool Empty()
+    {
+        return size == 0;
+    }
+
 }
 
 

@@ -15,10 +15,12 @@ public class Pathfinding
     private Grid<PathNode> grid;
     private PiorityQueueHeap<PathNode> piorityQueue;
     private List<PathNode> closedList;
+    private List<PathNode> openedList;
     private PathNode currentNode;
-    public Pathfinding(int rows, int colls, Vector3 originPos )
+    
+    public Pathfinding(int rows, int colls, float cellSize ,Vector3 originPos )
     {
-        grid = new Grid<PathNode>(rows, colls, 1f ,originPos, (Grid<PathNode> g, int x, int y) => new PathNode(g, x, y), false);
+        grid = new Grid<PathNode>(rows, colls, cellSize ,originPos, (Grid<PathNode> g, int x, int y) => new PathNode(g, x, y), false);
     }
 
     public List<PathNode> FindPath(Vector3 startWoldPos, Vector3 endPos)
@@ -35,20 +37,54 @@ public class Pathfinding
     {
         startNode.heurecticCostToTheEnd = CalculateDistance(startNode, endNode);
         startNode.costFromStartToTheCell = 0;
+        startNode.CalculateTotalCost();
         startNode.previousNode = null;
-        List<PathNode> tempList = new List<PathNode>{startNode};
-        piorityQueue = new PiorityQueueHeap<PathNode>(tempList);
-        while(currentNode != endNode) 
+        
+        openedList = new List<PathNode>();
+        openedList.Add(startNode);
+        closedList = new List<PathNode>();
+
+        for(int x = 0; x < grid.GetCollumns(); x++)
+            for(int y = 0; y < grid.GetRows(); y++)
+                {
+                    PathNode node = grid.GetGridObject(x, y);
+                    node.costFromStartToTheCell = Int32.MaxValue;
+                    node.previousNode = null;
+                    node.CalculateTotalCost();
+                }
+
+        //piorityQueue = new PiorityQueueHeap<PathNode>(tempList);
+        while(openedList.Count > 0) 
         {
-            currentNode = piorityQueue.Dequeue();
+            currentNode = GetLowestTotalCostNode();
+            if (currentNode == endNode)
+            {
+                return GetPath(currentNode);
+            }
+            openedList.Remove(currentNode);
+            closedList.Add(currentNode);
+
             foreach(var neighbour in GetNeighbours(currentNode)) 
             {
-                neighbour.costFromStartToTheCell = CalculateDistance(startNode, neighbour);
-                neighbour.heurecticCostToTheEnd = CalculateDistance(neighbour, endNode);
-                neighbour.CalculateTotalCost();
+                if(closedList.Contains(neighbour)) continue;
 
+                int estimateGcost = currentNode.costFromStartToTheCell + CalculateDistance(currentNode, neighbour);
+                
+                if(estimateGcost < neighbour.costFromStartToTheCell)
+                {
+                    neighbour.previousNode = currentNode;
+                    neighbour.costFromStartToTheCell = estimateGcost;
+                    neighbour.heurecticCostToTheEnd = CalculateDistance(neighbour, endNode);
+                    neighbour.CalculateTotalCost();
+                    
+                    if(!openedList.Contains(neighbour))
+                        openedList.Add(neighbour);
+                }
             }
         }
+
+        
+        return null;
     }
 
     private int CalculateDistance(PathNode pn1, PathNode pn2)
@@ -62,14 +98,40 @@ public class Pathfinding
     private List<PathNode> GetNeighbours(PathNode node)
     {
         List<PathNode> exitList = new List<PathNode>();
-        for(int i = -1; i < 1; i++)
-            for(int j = -1; j < 1; j++)
+        for(int i = -1; i <= 1; i++)
+            for(int j = -1; j <= 1; j++)
             {
                 PathNode currentNode = grid.GetGridObject(node.x + i, node.y + j);
-                if( i != 0 && j != 0 && currentNode != null && currentNode.isWakalbe)
+                if( !( i == 0 && j == 0) && currentNode != null)
+                {
                     exitList.Add(currentNode);
+                }
             }
         return exitList;
+    }
+
+    private List<PathNode> GetPath(PathNode endNode)
+    {
+        List<PathNode> path = new List<PathNode>{endNode};
+        currentNode = endNode.previousNode;
+        
+        while(currentNode != null)
+        {
+            path.Add(currentNode);
+            currentNode = currentNode.previousNode;
+        }
+
+        path.Reverse();
+        return path;
+    }
+
+    private PathNode GetLowestTotalCostNode()
+    {
+        PathNode minTotalCostNode = openedList[0];
+        foreach(var node in openedList)
+            if(minTotalCostNode.totalcost > node.totalcost)
+                minTotalCostNode = node;
+        return minTotalCostNode;
     }
 }
 
@@ -85,11 +147,12 @@ public class PathNode : IComparable<PathNode>
     public bool isWakalbe;
     public PathNode previousNode;
 
-    public PathNode(Grid<PathNode> grid, int x, int y)
+    public PathNode(Grid<PathNode> grid, int x, int y, bool walkable = true)
     {
         this.grid = grid;
         this.x = x;
         this.y = y;
+        this.isWakalbe = walkable;
     }
 
     public void CalculateTotalCost()
@@ -125,6 +188,11 @@ public class PathNode : IComparable<PathNode>
     public static bool operator <= (PathNode operand1, PathNode operand2)
     {
         return operand1.CompareTo(operand2) <= 0;
+    }
+
+    public override string ToString()
+    {
+        return x +" "+ y;
     }
 }
 }
