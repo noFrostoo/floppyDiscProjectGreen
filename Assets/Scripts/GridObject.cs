@@ -1,27 +1,33 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 
 namespace FloppyDiscProjectGreen
 {
 namespace CombatSystem
 {
-public class GridObject
+public class GridObject : IComparable<GridObject>
 {
-    int x;
-    int y;
+    int xPos;
+    int yPos;
     Grid<GridObject> grid;
     private bool walkable = true;
     public GameObject objectInTile;
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
     
+    public int totalcost;
+    public int costFromStartToTheCell;
+    public int heurecticCostToTheEnd;
+
+    public GridObject previousNode;
+
     public GridObject(Grid<GridObject> grid, int x, int y)
     {
         this.grid = grid;
-        this.x = x;
-        this.y = y;
+        this.xPos = x;
+        this.yPos = y;
     }
     
     // checkes if this grid tile is walkable
@@ -34,14 +40,24 @@ public class GridObject
         return walkable;
     }
 
+    public int x()
+    {
+        return xPos;
+    }
+
+    public int y()
+    {
+        return yPos;
+    }
+
     public override string ToString()
     {
-        return x.ToString() + " " + y.ToString();
+        return xPos.ToString() + " " + yPos.ToString();
     }
 
     public Vector3 GetCellPos()
     {
-        return grid.GetWorldPos(x, y) + new Vector3(grid.GetCellSize(), grid.GetCellSize()) * .5f;
+        return grid.GetWorldPos(xPos, yPos) + new Vector3(grid.GetCellSize(), grid.GetCellSize()) * .5f;
     }
 
     public void setIdleCellSprite(GameObject sprite)
@@ -63,6 +79,42 @@ public class GridObject
     {
         return activeCellSprite;
     }
+
+    public void CalculateTotalCost()
+    {
+        totalcost = costFromStartToTheCell + heurecticCostToTheEnd;
+    }
+
+    public void SetTotalCost(int newTotalCost)
+    {
+        totalcost = newTotalCost;
+    }
+    public int CompareTo(GridObject other)
+    {
+        if(other == null) return 1;
+        return totalcost.CompareTo(other.totalcost);
+    }
+
+    public static bool operator > (GridObject operand1, GridObject operand2)
+    {
+        return operand1.CompareTo(operand2) == 1;
+    }
+
+    public static bool operator < (GridObject operand1, GridObject operand2)
+    {
+        return operand1.CompareTo(operand2) == -1;
+    }
+
+    public static bool operator >= (GridObject operand1, GridObject operand2)
+    {
+        return operand1.CompareTo(operand2) >= 0;
+    }
+
+    public static bool operator <= (GridObject operand1, GridObject operand2)
+    {
+        return operand1.CompareTo(operand2) <= 0;
+    }
+    
 }
 }
 }
