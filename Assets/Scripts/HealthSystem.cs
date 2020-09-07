@@ -41,13 +41,13 @@ public class HealthSystem
 
     public bool isDead()
     {
-        return currentHealth < 0;
+        return currentHealth <= 0;
     }
 
     public void TakeDamage(int amount)
     {
         currentHealth -= amount;
-        if(currentHealth < 0)
+        if(currentHealth <= 0)
             currentHealth = 0;
         if(isDead()) Die();
         OnDamaged?.Invoke(this, EventArgs.Empty);
