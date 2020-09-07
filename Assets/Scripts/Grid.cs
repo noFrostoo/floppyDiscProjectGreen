@@ -83,7 +83,7 @@ public class Grid<TypeGridObject>
         return new Vector3(x, y) * cellSize + originPosition;
     }
 
-    private Vector2Int GetXY(Vector3 worldPos)
+    public Vector2Int GetXY(Vector3 worldPos)
     {
         int x = Mathf.FloorToInt((worldPos.x - originPosition.x) / cellSize);
         int y = Mathf.FloorToInt((worldPos.y - originPosition.y) / cellSize);

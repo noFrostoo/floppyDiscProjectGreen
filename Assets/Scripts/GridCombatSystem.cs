@@ -6,15 +6,11 @@ using System;
 
 public class GridCombatSystem : MonoBehaviour
 {
-    public event EventHandler<OnGridReadArgs> onGridReady;
-    public class OnGridReadArgs : EventArgs
-    {
-        public Action onGridReadyAction;
-    }
+    public delegate void OnGridReadEventHandler();
+    public event OnGridReadEventHandler onGridReady;
 
     private GridComplete grid;
     private Pathfinding pFgrid;
-    // Start is called before the first frame update
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
 
@@ -30,12 +26,13 @@ public class GridCombatSystem : MonoBehaviour
     void Start()
     {
         //grid = new Grid<GridObject>(10, 20, 1f, new Vector3(-13, -6), (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y), debug );
+        //pFgrid = new Pathfinding(10, 20, 1f, new Vector3(-13, -6));
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
         grid.SetUnwalkable(unWalkableCells);
-        //pFgrid = new Pathfinding(10, 20, 1f, new Vector3(-13, -6));
-        SetUp();
 
-        if(onGridReady != null) onGridReady(this, new OnGridReadArgs{onGridReadyAction = OnGridReadyAction });
+        SetUp();
+        SetUpOnGridReady();
+        UpdateObjectsInCellRefrences();
     }
 
     void SetUp()
@@ -57,6 +54,21 @@ public class GridCombatSystem : MonoBehaviour
         gridRead = true;
     }
 
+    void SetUpOnGridReady()
+    {
+        onGridReady += OnGridReadyAction;
+        if(onGridReady != null) onGridReady();
+    }
+
+    public void UpdateObjectsInCellRefrences()
+    {
+        grid.GetGridObject(player.transform.position).SetObjectInTile(player.gameObject);
+        foreach(var character in charactersInFight)
+        {
+            grid.GetGridObject(character.transform.position).SetObjectInTile(character);
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -64,16 +76,13 @@ public class GridCombatSystem : MonoBehaviour
         updateActiveCell(currentActiveCell);   
         if(Input.GetMouseButtonDown(0))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            List<GridObject> path = grid.FindPath(new Vector3(-13, -6), mousePos);
-            foreach(var node in path)
-            {
-                Instantiate(idleCellSprite, grid.GetGridObject(node.x(), node.y()).GetCellPos(), idleCellSprite.transform.rotation);
-            }
+            grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition)).AttactObjectInTile(30);
         }  
         if(Input.GetMouseButtonDown(1))
         {
-            player.MoveTo(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            player.MoveTo(mousePos);
+            grid.GetGridObject(mousePos).SetObjectInTile(player.gameObject);
         }
     }
 

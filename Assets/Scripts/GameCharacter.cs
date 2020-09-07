@@ -15,7 +15,7 @@ public class GameCharacter : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gridCS.onGridReady += Grid_SnapToCell;
+        gridCS.onGridReady += SnapToCell;
         SetUpHealtText();
     }
 
@@ -44,11 +44,6 @@ public class GameCharacter : MonoBehaviour
         healthText.transform.position = transform.position + healthTextOffset;
     }
 
-    void Grid_SnapToCell(object sender, GridCombatSystem.OnGridReadArgs eventArgs)
-    {
-        SnapToCell();
-    }
-
     void SnapToCell()
     {
         transform.position = gridCS.GetGrid().GetGridObject(transform.position).GetCellPos();
@@ -56,13 +51,22 @@ public class GameCharacter : MonoBehaviour
 
     public void MoveTo(Vector3 moveToPosition)
     {
-        GridObject cell = gridCS.GetGrid().GetGridObject(moveToPosition);
-        if(cell.isWalkable())
-            transform.position = cell.GetCellPos();
+        List<GridObject> path = gridCS.GetGrid().FindPath(transform.position, moveToPosition);
+        StartCoroutine(followPath(path));
+    }
+
+    IEnumerator followPath(List<GridObject> path)
+    {
+        foreach(var pathNode in path)
+        {
+            transform.position = pathNode.GetCellPos();
+            yield return new WaitForSeconds(0.1f);
+        }
     }
 
     public void TakeDamage(int damage)
     {
         health -= damage;
     }
+
 }
