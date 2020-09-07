@@ -2,11 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using FloppyDiscProjectGreen.CombatSystem;
+using System;
 
 public class GridCombatSystem : MonoBehaviour
 {
-    public GridComplete grid;
-    public Pathfinding pFgrid;
+    public event EventHandler<OnGridReadArgs> onGridReady;
+    public class OnGridReadArgs : EventArgs
+    {
+        public Action onGridReadyAction;
+    }
+
+    private GridComplete grid;
+    private Pathfinding pFgrid;
     // Start is called before the first frame update
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
@@ -14,13 +21,21 @@ public class GridCombatSystem : MonoBehaviour
     private GameObject activeCellGameObject;
     private GridObject lastActiveCell;
     
+    public bool gridRead = false;
+
     [SerializeField] private bool debug;
+    [SerializeField] private  List<Vector2Int> unWalkableCells; 
+    private GameObject[] charactersInFight;
+    private GameCharacter player;
     void Start()
     {
         //grid = new Grid<GridObject>(10, 20, 1f, new Vector3(-13, -6), (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y), debug );
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
+        grid.SetUnwalkable(unWalkableCells);
         //pFgrid = new Pathfinding(10, 20, 1f, new Vector3(-13, -6));
         SetUp();
+
+        if(onGridReady != null) onGridReady(this, new OnGridReadArgs{onGridReadyAction = OnGridReadyAction });
     }
 
     void SetUp()
@@ -32,6 +47,14 @@ public class GridCombatSystem : MonoBehaviour
         }
         activeCellGameObject = Instantiate(activeCellSprite, new Vector3(0,0,0), activeCellSprite.transform.rotation);
         activeCellGameObject.SetActive(false);
+
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<GameCharacter>();
+        charactersInFight = GameObject.FindGameObjectsWithTag("Enemy");
+    }
+
+    public void OnGridReadyAction()
+    {
+        gridRead = true;
     }
 
     // Update is called once per frame
@@ -48,6 +71,16 @@ public class GridCombatSystem : MonoBehaviour
                 Instantiate(idleCellSprite, grid.GetGridObject(node.x(), node.y()).GetCellPos(), idleCellSprite.transform.rotation);
             }
         }  
+        if(Input.GetMouseButtonDown(1))
+        {
+            player.MoveTo(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+        }
+    }
+
+
+    public GridComplete GetGrid()
+    {
+        return grid;
     }
 
     void updateActiveCell(GridObject currentActiveCell)

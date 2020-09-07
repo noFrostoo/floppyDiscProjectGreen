@@ -40,6 +40,11 @@ public class GridObject : IComparable<GridObject>
         return walkable;
     }
 
+    public void SetWalkable(bool newWalkable)
+    {
+        walkable = newWalkable;
+    }
+
     public int x()
     {
         return xPos;
@@ -50,9 +55,22 @@ public class GridObject : IComparable<GridObject>
         return yPos;
     }
 
+    public void SetObjectInTile(GameObject newObject)
+    {
+        objectInTile = newObject;
+    }
+
+    public void AttactObjectInTile(int damage)
+    {
+        objectInTile.GetComponent<GameCharacter>().TakeDamage(damage);
+    }
+
     public override string ToString()
     {
-        return xPos.ToString() + " " + yPos.ToString();
+        if(walkable)
+            return xPos.ToString() + " " + yPos.ToString();
+        else
+            return "X";
     }
 
     public Vector3 GetCellPos()

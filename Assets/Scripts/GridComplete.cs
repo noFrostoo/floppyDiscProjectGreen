@@ -9,6 +9,8 @@ namespace CombatSystem
 {
 public class GridComplete : Grid<GridObject>
 {
+
+
     private const int DIAGONAL_MOVE_COST = 14;
     private const int STRAIGH_MOVE_COST = 10;
 
@@ -16,9 +18,24 @@ public class GridComplete : Grid<GridObject>
     private List<GridObject> openedList;
     private GridObject currentNode;
 
-    public GridComplete(int rows, int colls, float cellSize, Vector3 originPosition, bool debug = true) : base(rows, colls, cellSize, originPosition, (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y), debug)
+    public GridComplete(int rows, int colls, float cellSize, Vector3 originPosition, bool debug = true, List<Vector2Int> unwalakbleList = null) : base(rows, colls, cellSize, originPosition, (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y), debug)
     {
+        if (unwalakbleList != null)
+            SetUnwalkable(unwalakbleList);
         
+        
+    }
+
+    public void SetUnwalkable(List<Vector2Int> unWalkableList)
+    {
+        foreach(var cellXY in unWalkableList)
+            SetUnwalkable(cellXY.x, cellXY.y);
+    }
+
+    public void SetUnwalkable(int x, int y)
+    {
+        GetGridObject(x, y).SetWalkable(false);
+        TriggerGridObjectChange(x, y);
     }
 
     public List<GridObject> FindPath(Vector3 startWoldPos, Vector3 endPos)
@@ -100,7 +117,7 @@ public class GridComplete : Grid<GridObject>
             for(int j = -1; j <= 1; j++)
             {
                 GridObject currentNode = GetGridObject(node.x() + i, node.y() + j);
-                if( !( i == 0 && j == 0) && currentNode != null)
+                if( !( i == 0 && j == 0) && currentNode != null && currentNode.isWalkable())
                 {
                     exitList.Add(currentNode);
                 }
@@ -131,6 +148,8 @@ public class GridComplete : Grid<GridObject>
                 minTotalCostNode = node;
         return minTotalCostNode;
     }
+
+
 }
 }
 }

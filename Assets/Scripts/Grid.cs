@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
 
 namespace FloppyDiscProjectGreen
 {
@@ -21,7 +22,7 @@ public class Grid<TypeGridObject>
    private float cellSize;
    private Vector3 originPosition;
    private TypeGridObject[,] grid;
-   private int debugFontSize = 5;
+   private int debugFontSize = 3;
    public Grid(int rows, int colls, float cellSize, Vector3 originPosition, Func<Grid<TypeGridObject> ,int, int, TypeGridObject> createGridObject, bool debug = true)
    {
        this.colls = colls;
@@ -38,17 +39,17 @@ public class Grid<TypeGridObject>
 
         if(debug)
         {
-        TextMesh[,] debugText = new TextMesh[colls, rows];
+        TextMeshPro[,] debugText = new TextMeshPro[colls, rows];
 
         for (int x = 0; x < colls; x++)
             for (int y = 0; y < rows; y++)
             {
                 debugText[x, y] = CreateDebugText(grid[x,y]?.ToString(), GetWorldPos(x, y) + new Vector3(cellSize, cellSize) * .5f, debugFontSize, Color.white);
-                Debug.DrawLine(GetWorldPos(x, y), GetWorldPos(x, y + 1), Color.white, 100f);
-                Debug.DrawLine(GetWorldPos(x, y), GetWorldPos(x + 1, y), Color.white, 100f);
+                Debug.DrawLine(GetWorldPos(x, y), GetWorldPos(x, y + 1), Color.white, 200f);
+                Debug.DrawLine(GetWorldPos(x, y), GetWorldPos(x + 1, y), Color.white, 200f);
             }
-        Debug.DrawLine(GetWorldPos(0, rows), GetWorldPos(colls, rows), Color.white, 100f);
-        Debug.DrawLine(GetWorldPos(colls, rows), GetWorldPos(colls, 0), Color.white, 100f);
+        Debug.DrawLine(GetWorldPos(0, rows), GetWorldPos(colls, rows), Color.white, 200f);
+        Debug.DrawLine(GetWorldPos(colls, rows), GetWorldPos(colls, 0), Color.white, 200f);
         
         OnValueChange += (object sender, OnValueChangeArgs eventArgs) => {debugText[eventArgs.x, eventArgs.y].text = grid[eventArgs.x, eventArgs.y].ToString();};
         }
@@ -132,12 +133,12 @@ public class Grid<TypeGridObject>
             }
     }
 
-    private static TextMesh CreateDebugText(string text, Vector3 position, int fontSize, Color color) {
-            GameObject gameObject = new GameObject("DebugText", typeof(TextMesh));
+    private static TextMeshPro CreateDebugText(string text, Vector3 position, int fontSize, Color color) {
+            GameObject gameObject = new GameObject("DebugText");
+            gameObject.AddComponent<TextMeshPro>();
             gameObject.transform.transform.position = position;
-            TextMesh textMesh = gameObject.GetComponent<TextMesh>();
-            textMesh.anchor = TextAnchor.MiddleCenter;
-            textMesh.alignment = TextAlignment.Center;
+            TextMeshPro textMesh = gameObject.GetComponent<TextMeshPro>();
+            textMesh.alignment = TextAlignmentOptions.Center;
             textMesh.text = text;
             textMesh.fontSize = fontSize;
             textMesh.color = color;
