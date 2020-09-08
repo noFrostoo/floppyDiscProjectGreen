@@ -67,6 +67,7 @@ public class GridObject : IComparable<GridObject>
 
     public override string ToString()
     {
+        if(objectInTile) return objectInTile.name;
         if(walkable)
             return xPos.ToString() + " " + yPos.ToString();
         else
@@ -106,6 +107,11 @@ public class GridObject : IComparable<GridObject>
     public void SetTotalCost(int newTotalCost)
     {
         totalcost = newTotalCost;
+    }
+    
+    public GameObject GetObjectInCell()
+    {
+        return objectInTile;
     }
     public int CompareTo(GridObject other)
     {

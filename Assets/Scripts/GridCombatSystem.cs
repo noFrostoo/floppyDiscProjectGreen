@@ -4,6 +4,10 @@ using UnityEngine;
 using FloppyDiscProjectGreen.CombatSystem;
 using System;
 
+namespace FloppyDiscProjectGreen
+{
+namespace CombatSystem
+{
 public class GridCombatSystem : MonoBehaviour
 {
     public delegate void OnGridReadEventHandler();
@@ -37,9 +41,9 @@ public class GridCombatSystem : MonoBehaviour
         grid.SetUnwalkable(unWalkableCells);
 
         SetUp();
+        SetUpOnGridReady();
         SetUpRadiousVisualiation(100);
         SetUpPathVisualiation(15);
-        SetUpOnGridReady();
         UpdateObjectsInCellRefrences();
     }
 
@@ -91,16 +95,21 @@ public class GridCombatSystem : MonoBehaviour
     public void UpdateObjectsInCellRefrences()
     {
         grid.GetGridObject(player.transform.position).SetObjectInTile(player.gameObject);
+        grid.TriggerGridObjectChange(grid.GetGridObject(player.transform.position).x(), grid.GetGridObject(player.transform.position).y());
         foreach(var character in charactersInFight)
         {
             grid.GetGridObject(character.transform.position).SetObjectInTile(character);
+            Debug.Log(character.name);
+            Debug.Log(grid.GetGridObject(character.transform.position).ToString());
+            Debug.Log(grid.GetGridObject(character.transform.position).GetObjectInCell().name);
+            grid.TriggerGridObjectChange(grid.GetGridObject(character.transform.position).x(), grid.GetGridObject(character.transform.position).y());
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var currentActiveCell = grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         var playerCell = grid.GetGridObject(player.transform.position);
 
@@ -133,15 +142,23 @@ public class GridCombatSystem : MonoBehaviour
 
         if(Input.GetMouseButtonDown(0))
         {
-            grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition)).AttactObjectInTile(30);
+            player.MeleeAttack(grid.GetGridObject(mousePos));
         }  
         if(Input.GetMouseButtonDown(1))
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if(path != null)
+            if(path != null && player.GetState() == GameCharacter.State.Idle)
+            {
+                grid.GetGridObject(player.transform.position).SetObjectInTile(null);
                 player.MoveTo(path);
-            grid.GetGridObject(mousePos).SetObjectInTile(player.gameObject);
+                grid.GetGridObject(path[path.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
+            }
         }
+        if(debug)
+        for(int x = 0; x < grid.GetCollumns(); x++)
+            for(int y = 0; y < grid.GetRows(); y++)
+            {
+                grid.TriggerGridObjectChange(x, y);
+            }
     }
 
 
@@ -212,4 +229,6 @@ public class GridCombatSystem : MonoBehaviour
         if(gridcell.getIdleCellSprite() == null) Destroy(gridcell.getIdleCellSprite());
         gridcell.setIdleCellSprite(Instantiate(idleCellSprite, gridcell.GetCellPos(), idleCellSprite.transform.rotation) as GameObject);
     }
+}
+}
 }
