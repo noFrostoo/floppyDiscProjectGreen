@@ -50,6 +50,8 @@ public class GridComplete : Grid<GridObject>
 
     public List<GridObject> FindPath(GridObject startNode, GridObject endNode)
     {
+        if(startNode == null || endNode == null) 
+            return null;
         startNode.heurecticCostToTheEnd = CalculateDistance(startNode, endNode);
         startNode.costFromStartToTheCell = 0;
         startNode.CalculateTotalCost();

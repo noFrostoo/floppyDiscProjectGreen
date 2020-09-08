@@ -7,10 +7,14 @@ using System;
 
 public class GameCharacter : MonoBehaviour
 {
+    private const int DIAGONAL_MOVE_COST = 14;
+    private const int STRAIGH_MOVE_COST = 10;
     [SerializeField] private GridCombatSystem gridCS;
     [SerializeField] private int health = 100;
     private HealthSystem healthSystem;
     private TextMeshPro healthText;
+    [SerializeField] public int actionPoints = 100;
+    [SerializeField] public int movmentPointsPerRound = 50;
     [SerializeField] private Vector3 healthTextOffset = new Vector3(0, 0.65f, 0);
     [SerializeField] private int healthTextFontSize = 4;
     [SerializeField] private Color healthTextColor = Color.white;
@@ -56,7 +60,26 @@ public class GameCharacter : MonoBehaviour
     public void MoveTo(Vector3 moveToPosition)
     {
         List<GridObject> path = gridCS.GetGrid().FindPath(transform.position, moveToPosition);
-        StartCoroutine(followPath(path));
+        MoveTo(path);
+    }
+
+    public void MoveTo(List<GridObject> path)
+    {
+        if(path == null) return;
+        int distanceToMove =  CalculateDistance(path[0], path[path.Count-1]);
+        if( distanceToMove <= movmentPointsPerRound)
+        {
+            actionPoints -= movmentPointsPerRound;
+            StartCoroutine(followPath(path));
+        }
+    }
+
+    private int CalculateDistance(GridObject pn1, GridObject pn2)
+    {
+        int discX = Math.Abs(pn1.x() - pn2.x());
+        int discY = Math.Abs(pn1.y() - pn2.y());
+        int reamaing = Math.Abs(discX - discY);
+        return DIAGONAL_MOVE_COST*Math.Min(discX, discY) + STRAIGH_MOVE_COST*reamaing;
     }
 
     IEnumerator followPath(List<GridObject> path)
@@ -66,6 +89,17 @@ public class GameCharacter : MonoBehaviour
             transform.position = pathNode.GetCellPos();
             yield return new WaitForSeconds(0.1f);
         }
+    }
+    
+    public bool CellInRadious(GridObject cell)
+    {
+        if(cell == null) return false;
+        return CalculateDistance(gridCS.GetGrid().GetGridObject(transform.position), cell) <= movmentPointsPerRound;
+    }
+
+    public int MaxCellMovmentRadious()
+    {
+        return movmentPointsPerRound/STRAIGH_MOVE_COST;
     }
 
     public void TakeDamage(int amount)
