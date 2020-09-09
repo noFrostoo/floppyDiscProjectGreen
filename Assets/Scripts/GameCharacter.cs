@@ -11,7 +11,7 @@ namespace CombatSystem
 {
 public class GameCharacter : MonoBehaviour
 {
-     public enum State
+    public enum State
     {
         Moving,
         Attacking,
@@ -19,6 +19,7 @@ public class GameCharacter : MonoBehaviour
     }
     public event EventHandler OnDoneMoving;
     public event EventHandler OnDoneAttacking;
+    public event EventHandler OnReady;
     private const int DIAGONAL_MOVE_COST = 14;
     private const int STRAIGH_MOVE_COST = 10;
     [SerializeField] private GridCombatSystem gridCS;
@@ -30,7 +31,9 @@ public class GameCharacter : MonoBehaviour
     [SerializeField] private int MeleeAttackRadious = 1; //in cells
     [SerializeField] private int MeleeDamage = 30;
     [SerializeField] public int actionPoints = 100;
+    private int actionPointThisRound;
     [SerializeField] public int movmentPointsPerRound = 50;
+    int movmentPointsThisRound;
     [SerializeField] private Vector3 healthTextOffset = new Vector3(0, 0.65f, 0);
     [SerializeField] private int healthTextFontSize = 4;
     [SerializeField] private Color healthTextColor = Color.white;
@@ -39,12 +42,21 @@ public class GameCharacter : MonoBehaviour
     {
         currentState = State.Idle;
         healthSystem = new HealthSystem(health);
-        healthSystem.OnDeath += Death;
-        OnDoneMoving += DoneMoving;
-        gridCS.onGridReady += SnapToCell;
+        SubscribeToEvents();
+        actionPointThisRound = actionPoints;
+        movmentPointsThisRound = movmentPointsPerRound;
         SetUpHealtText();
+        OnReady.Invoke(this, EventArgs.Empty);
     }
 
+    void SubscribeToEvents()
+    {
+        healthSystem.OnDeath += Death;
+        OnDoneMoving += DoneMoving;
+        OnDoneAttacking += DoneAttacking;
+        gridCS.onGridReady += SnapToCell;
+        gridCS.OnPlayerRound += Grid_NewRound;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -86,9 +98,10 @@ public class GameCharacter : MonoBehaviour
     {
         if(path == null) return;
         int distanceToMove =  CalculateDistance(path[0], path[path.Count-1]);
-        if( distanceToMove <= movmentPointsPerRound)
+        if( distanceToMove <= movmentPointsThisRound)
         {
-            actionPoints -= movmentPointsPerRound;
+            actionPointThisRound -= distanceToMove;
+            movmentPointsThisRound -= distanceToMove;
             currentState = State.Moving;
             StartCoroutine(followPath(path));
         }
@@ -115,7 +128,7 @@ public class GameCharacter : MonoBehaviour
     public bool CellInRadious(GridObject cell)
     {
         if(cell == null) return false;
-        return CalculateDistance(gridCS.GetGrid().GetGridObject(transform.position), cell) <= movmentPointsPerRound;
+        return CalculateDistance(gridCS.GetGrid().GetGridObject(transform.position), cell) <= movmentPointsThisRound;
     }
 
     public bool InRadious(Vector3 position)
@@ -141,6 +154,7 @@ public class GameCharacter : MonoBehaviour
         if(discX == discY && discX <= MeleeAttackRadious) return true;
         return false;
     }
+  
     public int MaxCellMovmentRadious()
     {
         return movmentPointsPerRound/STRAIGH_MOVE_COST;
@@ -156,25 +170,24 @@ public class GameCharacter : MonoBehaviour
         Debug.Log("The " + name + "has died");
     }
 
-    public void MeleeAttack(GameCharacter target)
-    {
-        if(target == null) return;
-        if(target.name == name) return;
-        Debug.Log(target.name);
-        if(InMeleeAttackRadious(target.transform.position))
-            target.TakeDamage(MeleeDamage);
-        else
-            Debug.Log("Out of Range");
-    }
-
     public void MeleeAttack(GridObject targetCell)
     {
         if(targetCell == null) return;
         if(targetCell.GetObjectInCell() == null) return;
-        if(targetCell.GetObjectInCell().name == name) return;
-        Debug.Log(targetCell.GetObjectInCell().name);
-        if(InMeleeAttackRadious(gridCS.GetGrid().GetGridObject(transform.position), targetCell))
-            targetCell.AttactObjectInTile(MeleeDamage);
+        MeleeAttack(targetCell.GetObjectInCell().GetComponent<GameCharacter>());
+    }
+
+    public void MeleeAttack(GameCharacter target)
+    {
+        if(target == null) return;
+        if(target.name == name) return;
+        
+        if(InMeleeAttackRadious(target.transform.position))
+        {
+            currentState = State.Attacking;
+            target.TakeDamage(MeleeDamage);
+            OnDoneAttacking.Invoke(this, EventArgs.Empty);
+        }
         else
             Debug.Log("Out of Range");
     }
@@ -189,10 +202,46 @@ public class GameCharacter : MonoBehaviour
         return currentState;
     }
 
+    void NewRound()
+    {
+        actionPointThisRound = actionPoints;
+        movmentPointsThisRound = movmentPointsPerRound;
+    }    
+
+    void Grid_NewRound(object sender, EventArgs e)
+    {
+        NewRound();
+    } 
     private void DoneMoving(object sender, EventArgs e)
     {
         currentState = State.Idle;
     }
+
+    private void DoneAttacking(object sender, EventArgs e)
+    {
+        currentState = State.Idle;
+    }
+
+    public int GetActionPoints()
+    {
+        return actionPoints;
+    }
+    
+    public int GetCurrentActionPoints()
+    {
+        return actionPointThisRound;
+    }
+    public int GetMovmentPoint()
+    {
+        return movmentPointsPerRound;
+    }
+
+    public int GetMovmentPointThisRound()
+    {
+        return movmentPointsThisRound;
+    }
+
+
 }
 }
 }

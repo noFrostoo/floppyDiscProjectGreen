@@ -10,8 +10,17 @@ namespace CombatSystem
 {
 public class GridCombatSystem : MonoBehaviour
 {
+    public enum State
+    {
+        playerRound,
+        enemyRound,
+
+    }
     public delegate void OnGridReadEventHandler();
     public event OnGridReadEventHandler onGridReady;
+    public event EventHandler OnStateChange;
+    public event EventHandler OnPlayerRound;
+    public event EventHandler OnEnemyRound;
 
     private GridComplete grid;
     private Pathfinding pFgrid;
@@ -24,6 +33,8 @@ public class GridCombatSystem : MonoBehaviour
     List<GridObject> path = null;
     public bool gridRead = false;
 
+    [SerializeField] State currentState;
+
     private bool mouseOutofRadious;
     private GameObject[] radiousVisualizationnPool;
     private GameObject[] pathVisualizationPool;
@@ -31,6 +42,7 @@ public class GridCombatSystem : MonoBehaviour
     [SerializeField] private bool debug;
     [SerializeField] private  List<Vector2Int> unWalkableCells; 
     private GameObject[] charactersInFight;
+    private GameObject[] enemies;
     private GameCharacter player;
 
     void Start()
@@ -39,6 +51,7 @@ public class GridCombatSystem : MonoBehaviour
         //pFgrid = new Pathfinding(10, 20, 1f, new Vector3(-13, -6));
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
         grid.SetUnwalkable(unWalkableCells);
+        currentState = State.playerRound;
 
         SetUp();
         SetUpOnGridReady();
@@ -59,9 +72,10 @@ public class GridCombatSystem : MonoBehaviour
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<GameCharacter>();
         charactersInFight = GameObject.FindGameObjectsWithTag("Enemy");
+        enemies = GameObject.FindGameObjectsWithTag("Enemy");
     }
 
-    void SetUpRadiousVisualiation(int amount)
+    void SetUpRadiousVisualiation(int amount) //!!
     {
         radiousVisualizationnPool = new GameObject[amount];
         for(int i = 0; i < amount; i++)
@@ -72,7 +86,7 @@ public class GridCombatSystem : MonoBehaviour
         }
     }
 
-    void SetUpPathVisualiation(int amount)
+    void SetUpPathVisualiation(int amount)  //!!
     {
         pathVisualizationPool = new GameObject[amount];
         for(int i = 0; i < amount; i++)
@@ -80,16 +94,6 @@ public class GridCombatSystem : MonoBehaviour
             pathVisualizationPool[i] = Instantiate(idleCellSprite, Vector3.zero, idleCellSprite.transform.rotation);
             pathVisualizationPool[i].SetActive(false);
         }
-    }
-    public void OnGridReadyAction()
-    {
-        gridRead = true;
-    }
-
-    void SetUpOnGridReady()
-    {
-        onGridReady += OnGridReadyAction;
-        if(onGridReady != null) onGridReady();
     }
 
     public void UpdateObjectsInCellRefrences()
@@ -106,6 +110,22 @@ public class GridCombatSystem : MonoBehaviour
         }
     }
 
+    void SetUpOnGridReady()
+    {
+        onGridReady += OnGridReadyAction;
+        if(onGridReady != null) onGridReady();
+    }
+    
+    public void OnGridReadyAction()
+    {
+        gridRead = true;
+    }
+
+    public GridComplete GetGrid()
+    {
+        return grid;
+    }
+
     // Update is called once per frame
     void Update()
     {
@@ -117,6 +137,23 @@ public class GridCombatSystem : MonoBehaviour
         if(lastPlayerCell == null) lastPlayerCell = playerCell;
 
         updateActiveCell(currentActiveCell); 
+        if(currentState == State.playerRound)
+        {
+            HandleRadiousVisualiation(currentActiveCell, playerCell);
+            HandlePathVisualiation(currentActiveCell, playerCell);
+            HandleMouseInput(mousePos);
+        }
+        else
+        {
+            ClearVisalizeRadious();
+            ClearVisualizePath();
+        }
+        if(debug) TriggerGridObjectChangeForWholeGrid();
+
+    }
+
+    void HandleRadiousVisualiation(GridObject currentActiveCell, GridObject playerCell)
+    {
         if(!player.CellInRadious(currentActiveCell) && !mouseOutofRadious)
         { 
             VisualizeRadious(playerCell);  
@@ -124,10 +161,13 @@ public class GridCombatSystem : MonoBehaviour
         }
         else if(player.CellInRadious(currentActiveCell) && mouseOutofRadious)
         {
-            EndVisalizeRadious(playerCell);
+            ClearVisalizeRadious();
             mouseOutofRadious = false;
         }
-   
+    }
+
+    void HandlePathVisualiation(GridObject currentActiveCell, GridObject playerCell)
+    {
         if(lastActiveCell != currentActiveCell || lastPlayerCell != playerCell)
         {  
             lastActiveCell = currentActiveCell;
@@ -139,32 +179,67 @@ public class GridCombatSystem : MonoBehaviour
                 VisualizePath(path);
             }
         }
+    }
 
-        if(Input.GetMouseButtonDown(0))
+    void HandleMouseInput(Vector3 mousePos)
+    {
+        if(currentState == State.playerRound)
         {
-            player.MeleeAttack(grid.GetGridObject(mousePos));
-        }  
-        if(Input.GetMouseButtonDown(1))
-        {
-            if(path != null && player.GetState() == GameCharacter.State.Idle)
+            if(Input.GetMouseButtonDown(0))
             {
-                grid.GetGridObject(player.transform.position).SetObjectInTile(null);
-                player.MoveTo(path);
-                grid.GetGridObject(path[path.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
+                player.MeleeAttack(grid.GetGridObject(mousePos));
+            }  
+            if(Input.GetMouseButtonDown(1))
+            {
+                if(path != null && player.GetState() == GameCharacter.State.Idle)
+                {
+                    grid.GetGridObject(player.transform.position).SetObjectInTile(null);
+                    player.MoveTo(path);
+                    grid.GetGridObject(path[path.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
+                }
             }
         }
-        if(debug)
+    }
+
+    public void ChangeState()
+    {
+        if(currentState == State.playerRound)
+        {
+            currentState = State.enemyRound;
+        }
+    } 
+
+    public void TriggerGridObjectChangeForWholeGrid()
+    {
         for(int x = 0; x < grid.GetCollumns(); x++)
             for(int y = 0; y < grid.GetRows(); y++)
             {
                 grid.TriggerGridObjectChange(x, y);
             }
     }
-
-
-    public GridComplete GetGrid()
+  
+    public void TriggerStateChange()
     {
-        return grid;
+        ChangeState();
+        OnStateChange?.Invoke(this, EventArgs.Empty);
+    }
+    
+    void HandleStateChange()
+    {
+        if(currentState == State.enemyRound)
+            EnemyRound();
+        if(currentState == State.playerRound)
+            PlayerRound();
+    }
+
+    void EnemyRound()
+    {
+        OnEnemyRound?.Invoke(this, EventArgs.Empty);
+    }
+
+    void PlayerRound()
+    {
+        OnPlayerRound?.Invoke(this, EventArgs.Empty);
     }
 
     void updateActiveCell(GridObject currentActiveCell)
@@ -196,7 +271,7 @@ public class GridCombatSystem : MonoBehaviour
             }
     }
 
-    void EndVisalizeRadious(GridObject playerCell)
+    void ClearVisalizeRadious()
     {
         for(int i = 0; i < radiousVisualizationnPool.Length; i++)
         {
