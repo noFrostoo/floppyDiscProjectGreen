@@ -25,8 +25,8 @@ public class GameCharacter : MonoBehaviour
     [SerializeField] private GridCombatSystem gridCS;
     [SerializeField] private int health = 100;
     private HealthSystem healthSystem;
-    private TextMeshPro healthText;
-    public bool moving;
+    private TextMeshPro healthText; //to DO delete
+    public bool moving; //to do check if it's even used
     [SerializeField] State currentState;
     [SerializeField] private int MeleeAttackRadious = 1; //in cells
     [SerializeField] private int MeleeDamage = 30;
@@ -136,7 +136,7 @@ public class GameCharacter : MonoBehaviour
         if(position == null) return false;
         GridObject cell =  gridCS.GetGrid().GetGridObject(position);
         GridObject playerCell = gridCS.GetGrid().GetGridObject(transform.position);
-        return CalculateDistance(playerCell, cell) <= movmentPointsPerRound;
+        return CalculateDistance(playerCell, cell) <= movmentPointsThisRound;
     }
     
     public bool InMeleeAttackRadious(Vector3 position)

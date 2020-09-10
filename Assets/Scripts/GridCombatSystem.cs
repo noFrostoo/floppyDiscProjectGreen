@@ -47,12 +47,10 @@ public class GridCombatSystem : MonoBehaviour
 
     void Start()
     {
-        //grid = new Grid<GridObject>(10, 20, 1f, new Vector3(-13, -6), (Grid<GridObject> g, int x, int y) => new GridObject(g, x, y), debug );
-        //pFgrid = new Pathfinding(10, 20, 1f, new Vector3(-13, -6));
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
         grid.SetUnwalkable(unWalkableCells);
         currentState = State.playerRound;
-
+        OnStateChange += HandleStateChange;
         SetUp();
         SetUpOnGridReady();
         SetUpRadiousVisualiation(100);
@@ -126,6 +124,10 @@ public class GridCombatSystem : MonoBehaviour
         return grid;
     }
 
+    public State GetState()
+    {
+        return currentState;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -140,7 +142,7 @@ public class GridCombatSystem : MonoBehaviour
         if(currentState == State.playerRound)
         {
             HandleRadiousVisualiation(currentActiveCell, playerCell);
-            HandlePathVisualiation(currentActiveCell, playerCell);
+            HandlePathFindingAndVisualiation(currentActiveCell, playerCell);
             HandleMouseInput(mousePos);
         }
         else
@@ -166,7 +168,7 @@ public class GridCombatSystem : MonoBehaviour
         }
     }
 
-    void HandlePathVisualiation(GridObject currentActiveCell, GridObject playerCell)
+    void HandlePathFindingAndVisualiation(GridObject currentActiveCell, GridObject playerCell)
     {
         if(lastActiveCell != currentActiveCell || lastPlayerCell != playerCell)
         {  
@@ -201,11 +203,14 @@ public class GridCombatSystem : MonoBehaviour
         }
     }
 
-    public void ChangeState()
+    private void ChangeState()
     {
         if(currentState == State.playerRound)
         {
             currentState = State.enemyRound;
+        }else if(currentState == State.enemyRound)
+        {
+            currentState = State.playerRound;
         }
     } 
 
@@ -224,7 +229,7 @@ public class GridCombatSystem : MonoBehaviour
         OnStateChange?.Invoke(this, EventArgs.Empty);
     }
     
-    void HandleStateChange()
+    void HandleStateChange(object sender, EventArgs e)
     {
         if(currentState == State.enemyRound)
             EnemyRound();

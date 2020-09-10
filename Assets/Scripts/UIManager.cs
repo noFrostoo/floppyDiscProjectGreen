@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
+using UnityEngine.UI;
 
 namespace FloppyDiscProjectGreen
 {
@@ -14,6 +15,7 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameCharacter player;
     [SerializeField] TextMeshProUGUI APText;
     [SerializeField] TextMeshProUGUI MovementPointText;
+    [SerializeField] Button nextRoundButton;
     // Start is called before the first frame update
     void Start()
     {
@@ -21,6 +23,7 @@ public class UIManager : MonoBehaviour
         player.OnDoneMoving += UpdateAPText;
         player.OnDoneAttacking += UpdateAPText;
         player.OnReady += UpdateAll;
+        gridCombatSystem.OnStateChange += UpdateButton;
     }
 
     // Update is called once per frame
@@ -42,6 +45,18 @@ public class UIManager : MonoBehaviour
     {
         UpdateAPText(this, EventArgs.Empty);
         UpdateMovmentPointsText(this, EventArgs.Empty);
+    }
+
+    void UpdateButton(object sender, EventArgs e)
+    {
+        if(gridCombatSystem.GetState() == GridCombatSystem.State.playerRound)
+        {
+            nextRoundButton.gameObject.SetActive(true);
+        }
+        else if(gridCombatSystem.GetState() == GridCombatSystem.State.enemyRound)
+        {
+            nextRoundButton.gameObject.SetActive(false);
+        }
     }
 }
 }
