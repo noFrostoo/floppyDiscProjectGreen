@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace FloppyDiscProjectGreen
 {
@@ -8,7 +9,7 @@ namespace CombatSystem
 {
 public interface IRangeWeaponBase
 {
-    void Fire(GameCharacter target);
+    int Fire(GameCharacter target);
 
     int Reload();
 
@@ -18,13 +19,13 @@ public interface IRangeWeaponBase
 
     int GetFireRate();
 
-    int GetDps();
-
     int GetCurrentAmmoInMagazine();
 
     GameObject GetProjectile();
 
     void ChangeFireMode(FireMode @enum);
+    void SetShooter(GameCharacter shooter);
+
 }
 
 
@@ -34,6 +35,20 @@ public enum FireMode
     Burst,
     Semi_Automatic,
     Custom,    
+}
+
+public class NoShooterSetException : System.Exception
+{
+    public NoShooterSetException(): base() {
+
+    }
+}
+
+public class NullTargetException : System.Exception
+{
+    public NullTargetException(): base() {
+        
+    }
 }
 
 }

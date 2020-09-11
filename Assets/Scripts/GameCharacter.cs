@@ -25,6 +25,7 @@ public class GameCharacter : MonoBehaviour
     [SerializeField] private GridCombatSystem gridCS;
     [SerializeField] private int health = 100;
     private HealthSystem healthSystem;
+    private RangeCombat rangeCombat;
     private TextMeshPro healthText; //to DO delete
     public bool moving; //to do check if it's even used
     [SerializeField] State currentState;
@@ -42,6 +43,7 @@ public class GameCharacter : MonoBehaviour
     {
         currentState = State.Idle;
         healthSystem = new HealthSystem(health);
+        rangeCombat = new RangeCombat();
         SubscribeToEvents();
         actionPointThisRound = actionPoints;
         movmentPointsThisRound = movmentPointsPerRound;
@@ -241,7 +243,7 @@ public class GameCharacter : MonoBehaviour
         return movmentPointsThisRound;
     }
 
-
+    
 }
 }
 }
