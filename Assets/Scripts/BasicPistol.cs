@@ -12,12 +12,12 @@ public class BasicPistol : IRangeWeaponBase
     GameObject projectile;
     GameCharacter shooter;
     BulletsMaker bulletsMaker;
-     int damage = 10;
+    int damage = 10;
     int fireRate = 20;
     int magazine = 9;
     int burstAmountOfShoots = 3;
     int waitingTimeBetwennShots; 
-    private int currentAmmoInMagazine;
+    int currentAmmoInMagazine;
     
     public BasicPistol(GameCharacter shooter)
     {
@@ -36,6 +36,7 @@ public class BasicPistol : IRangeWeaponBase
     {
         if(shooter == null) throw new NoShooterSetException();
         if(target == null) throw new NullTargetException();
+        if(currentAmmoInMagazine == 0) throw new NoAmmoInMag();
         switch(fireMode)
         {
             case FireMode.Semi_Automatic:
@@ -55,6 +56,9 @@ public class BasicPistol : IRangeWeaponBase
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
         int amoutOfShoots = shooter.GetActionPoints()/damage;
+        if(amoutOfShoots < currentAmmoInMagazine)
+            amoutOfShoots = currentAmmoInMagazine;
+        currentAmmoInMagazine -= amoutOfShoots;
         bulletsMaker.Fire(amoutOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
         return amoutOfShoots*damage;
     }
@@ -63,13 +67,17 @@ public class BasicPistol : IRangeWeaponBase
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
         int amoutOfShoots = shooter.GetActionPoints()/damage;
+        if(amoutOfShoots < currentAmmoInMagazine)
+            amoutOfShoots = currentAmmoInMagazine;
         if(amoutOfShoots < burstAmountOfShoots)
         {
+            currentAmmoInMagazine -= amoutOfShoots;
             bulletsMaker.Fire(amoutOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
             return amoutOfShoots*damage;
         }
         else
         {
+            currentAmmoInMagazine -= burstAmountOfShoots;
             bulletsMaker.Fire(burstAmountOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
             return burstAmountOfShoots*damage;
         }    
@@ -78,13 +86,14 @@ public class BasicPistol : IRangeWeaponBase
     private int FireSemiAutomatic(GameCharacter target)
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
+        currentAmmoInMagazine -= 1;
         bulletsMaker.Fire(1, lookDirection, projectile, shooter, waitingTimeBetwennShots);
         return damage;
     }
 
     public int GetCurrentAmmoInMagazine()
     {
-        throw new System.NotImplementedException();
+        return currentAmmoInMagazine;
     }
 
     public int GetDamage()
@@ -109,7 +118,9 @@ public class BasicPistol : IRangeWeaponBase
 
     public int Reload()
     {
-        throw new System.NotImplementedException();
+        int missingAmmo = magazine - currentAmmoInMagazine;
+        currentAmmoInMagazine = magazine;
+        return missingAmmo;
     }
 
     public void SetShooter(GameCharacter shooter)

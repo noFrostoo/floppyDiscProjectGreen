@@ -31,8 +31,8 @@ public class GameCharacter : MonoBehaviour
     [SerializeField] State currentState;
     [SerializeField] private int MeleeAttackRadious = 1; //in cells
     [SerializeField] private int MeleeDamage = 30;
-    [SerializeField] public int actionPoints = 100;
-    private int actionPointThisRound;
+    [SerializeField] private int actionPoints = 100;
+    public int actionPointThisRound;
     [SerializeField] public int movmentPointsPerRound = 50;
     int movmentPointsThisRound;
     [SerializeField] private Vector3 healthTextOffset = new Vector3(0, 0.65f, 0);
@@ -43,7 +43,8 @@ public class GameCharacter : MonoBehaviour
     {
         currentState = State.Idle;
         healthSystem = new HealthSystem(health);
-        rangeCombat = new RangeCombat();
+        rangeCombat = new RangeCombat(this);
+        rangeCombat.ChangeWeapon(new BasicPistol(this));
         SubscribeToEvents();
         actionPointThisRound = actionPoints;
         movmentPointsThisRound = movmentPointsPerRound;
@@ -196,9 +197,13 @@ public class GameCharacter : MonoBehaviour
 
     public void RangeAttack(GameCharacter target)
     {
-
+        rangeCombat.Fire(target);
     }
 
+    public void ReloadMagazine()
+    {
+        rangeCombat.Reload();
+    }
     public State GetState()
     {
         return currentState;
@@ -206,8 +211,12 @@ public class GameCharacter : MonoBehaviour
 
     void NewRound()
     {
-        actionPointThisRound = actionPoints;
-        movmentPointsThisRound = movmentPointsPerRound;
+        actionPointThisRound += actionPoints;
+        if(actionPointThisRound > actionPoints)
+            actionPointThisRound = actionPoints;
+        movmentPointsThisRound += movmentPointsPerRound;
+        if(movmentPointsThisRound > movmentPointsPerRound)
+            movmentPointsThisRound = movmentPointsPerRound;
     }    
 
     void Grid_NewRound(object sender, EventArgs e)
@@ -243,7 +252,20 @@ public class GameCharacter : MonoBehaviour
         return movmentPointsThisRound;
     }
 
-    
+    public void DecreaseActionPoints(int amount)
+    {
+        // if(actionPointThisRound < amount) 
+        //     ;
+        actionPointThisRound -= amount;
+    }
+
+    public void IncreaseActionPoints(int amount)
+    {
+        actionPointThisRound += amount;
+        if(actionPointThisRound > actionPoints)
+            actionPointThisRound = actionPoints;
+
+    }
 }
 }
 }

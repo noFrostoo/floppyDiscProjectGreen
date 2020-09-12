@@ -51,5 +51,9 @@ public class NullTargetException : System.Exception
     }
 }
 
+public class NoAmmoInMag : System.Exception
+{
+    
+}
 }
 }

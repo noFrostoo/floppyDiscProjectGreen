@@ -19,21 +19,15 @@ public class RangeCombat
     [SerializeField] int ammuniton;
     GameCharacter shooter;
 
-    // Start is called before the first frame update
-    void Start()
+    public RangeCombat(GameCharacter shooter)
     {
+        this.shooter = shooter;
         OnWeponChange += ChangeWeapon_EVENT;
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Fire(GameCharacter target)
     {
-        
-    }
-
-    public void Fire(GameObject target)
-    {
-        currentWeapon.Fire(target.GetComponent<GameCharacter>());
+        shooter.DecreaseActionPoints(currentWeapon.Fire(target));
     }
     
     public void Reload()
@@ -48,12 +42,14 @@ public class RangeCombat
     public void ChangeWeapon_EVENT(object sender, OnWeponChangeArgs e)
     {
         currentWeapon = e.newWeapon;
-        ammuniton = e.newAmmo;
+        if(e.newAmmo > 0)
+            ammuniton = e.newAmmo;
     }
 
-    public void ChangeWeapon(int newAmmo, IRangeWeaponBase weapon)
+    public void ChangeWeapon(IRangeWeaponBase weapon, int newAmmo = -1 )
     {
-        ammuniton = newAmmo;
+        if(newAmmo > 0)
+            ammuniton = newAmmo;
         currentWeapon = weapon;
     }
 
