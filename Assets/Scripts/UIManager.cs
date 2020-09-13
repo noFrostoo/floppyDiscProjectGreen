@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour
     }
     void UpdateMovmentPointsText(object sender, EventArgs e)
     {
-        MovementPointText.SetText("MovmentPoint: " + player.GetCurrentActionPoints());
+        MovementPointText.SetText("MovmentPoint: " + player.GetMovmentPointThisRound());
     }
 
     void UpdateAll(object sender, EventArgs e)

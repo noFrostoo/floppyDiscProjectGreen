@@ -8,6 +8,7 @@ namespace CombatSystem
 {
 public class BulletsMaker : MonoBehaviour
 {
+    [SerializeField] public float forceStrengh = 0.2f;
     // Start is called before the first frame update
     void Start()
     {
@@ -28,8 +29,9 @@ public class BulletsMaker : MonoBehaviour
     {
         for(int i = 0; i < amoutOfShoots; i++)
         {
-            Rigidbody2D projectileRb = Instantiate(projectile, shooter.transform.position, projectile.transform.rotation).GetComponent<Rigidbody2D>();
-            projectileRb.AddForce(lookDirection, ForceMode2D.Impulse);
+            GameObject bullet =  Instantiate(projectile, shooter.transform.position + new Vector3(1, 0, 0), projectile.transform.rotation);
+            Rigidbody2D projectileRb = bullet.GetComponent<Rigidbody2D>();
+            projectileRb.AddForce(lookDirection.normalized*forceStrengh, ForceMode2D.Impulse);
             yield return new WaitForSeconds(waitingTimeBetwennShots);
         }
     }

@@ -25,6 +25,9 @@ public class BasicPistol : IRangeWeaponBase
         bulletsMaker = shooter.GetComponent<BulletsMaker>();
         if(bulletsMaker == null)
             bulletsMaker = shooter.gameObject.AddComponent<BulletsMaker>();
+        projectile = Resources.Load("Prefabs/Projectile") as GameObject;
+        waitingTimeBetwennShots = fireRate/60;
+        currentAmmoInMagazine = 9;
     }
 
     public void ChangeFireMode(FireMode fireMode)
@@ -59,7 +62,7 @@ public class BasicPistol : IRangeWeaponBase
         if(amoutOfShoots < currentAmmoInMagazine)
             amoutOfShoots = currentAmmoInMagazine;
         currentAmmoInMagazine -= amoutOfShoots;
-        bulletsMaker.Fire(amoutOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
+        shooter.StartShooting(amoutOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
         return amoutOfShoots*damage;
     }
 
@@ -72,13 +75,13 @@ public class BasicPistol : IRangeWeaponBase
         if(amoutOfShoots < burstAmountOfShoots)
         {
             currentAmmoInMagazine -= amoutOfShoots;
-            bulletsMaker.Fire(amoutOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
+            shooter.StartShooting(amoutOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
             return amoutOfShoots*damage;
         }
         else
         {
             currentAmmoInMagazine -= burstAmountOfShoots;
-            bulletsMaker.Fire(burstAmountOfShoots, lookDirection, projectile, shooter, waitingTimeBetwennShots);
+            shooter.StartShooting(burstAmountOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
             return burstAmountOfShoots*damage;
         }    
     }
@@ -87,7 +90,7 @@ public class BasicPistol : IRangeWeaponBase
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
         currentAmmoInMagazine -= 1;
-        bulletsMaker.Fire(1, lookDirection, projectile, shooter, waitingTimeBetwennShots);
+        shooter.StartShooting(1, lookDirection, projectile,  waitingTimeBetwennShots);
         return damage;
     }
 

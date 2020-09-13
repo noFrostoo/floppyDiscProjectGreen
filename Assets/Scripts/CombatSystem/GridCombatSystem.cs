@@ -187,7 +187,7 @@ public class GridCombatSystem : MonoBehaviour
         {
             if(Input.GetMouseButtonDown(0))
             {
-                player.MeleeAttack(grid.GetGridObject(mousePos));
+                player.RangeAttack(grid.GetGridObject(mousePos).GetObjectInCell().GetComponent<GameCharacter>());
             }  
             if(Input.GetMouseButtonDown(1))
             {

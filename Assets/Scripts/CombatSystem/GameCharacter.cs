@@ -43,7 +43,7 @@ public class GameCharacter : MonoBehaviour
     {
         currentState = State.Idle;
         healthSystem = new HealthSystem(health);
-        rangeCombat = new RangeCombat(this);
+        rangeCombat = new RangeCombat(gameObject.GetComponent<GameCharacter>());
         rangeCombat.ChangeWeapon(new BasicPistol(this));
         SubscribeToEvents();
         actionPointThisRound = actionPoints;
@@ -197,6 +197,7 @@ public class GameCharacter : MonoBehaviour
 
     public void RangeAttack(GameCharacter target)
     {
+        currentState = State.Attacking;
         rangeCombat.Fire(target);
     }
 
@@ -266,6 +267,24 @@ public class GameCharacter : MonoBehaviour
             actionPointThisRound = actionPoints;
 
     }
+   public void StartShooting(int amoutOfShoots, Vector2 lookDirection, GameObject projectile, int waitingTimeBetwennShots)
+    {
+        StartCoroutine(FireShots(amoutOfShoots, lookDirection, projectile, waitingTimeBetwennShots));
+    }
+    
+    IEnumerator FireShots(int amoutOfShoots, Vector2 lookDirection, GameObject projectile, int waitingTimeBetwennShots)
+    {
+        float forceStrengh = 0.2f;
+        for(int i = 0; i < amoutOfShoots; i++)
+        {
+            GameObject bullet =  Instantiate(projectile, transform.position + new Vector3(1, 0, 0), projectile.transform.rotation);
+            Rigidbody2D projectileRb = bullet.GetComponent<Rigidbody2D>();
+            projectileRb.AddForce(lookDirection.normalized*forceStrengh, ForceMode2D.Impulse);
+            yield return new WaitForSeconds(waitingTimeBetwennShots);
+        }
+        OnDoneAttacking?.Invoke(this, EventArgs.Empty);
+    } 
+    
 }
 }
 }
