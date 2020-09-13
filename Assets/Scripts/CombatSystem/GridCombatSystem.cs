@@ -23,7 +23,6 @@ public class GridCombatSystem : MonoBehaviour
     public event EventHandler OnEnemyRound;
 
     private GridComplete grid;
-    private Pathfinding pFgrid;
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
 
@@ -52,10 +51,11 @@ public class GridCombatSystem : MonoBehaviour
         currentState = State.playerRound;
         OnStateChange += HandleStateChange;
         SetUp();
-        SetUpOnGridReady();
         SetUpRadiousVisualiation(100);
         SetUpPathVisualiation(15);
+
         UpdateObjectsInCellRefrences();
+        SetUpOnGridReady();
     }
 
     void SetUp()
@@ -101,9 +101,6 @@ public class GridCombatSystem : MonoBehaviour
         foreach(var character in charactersInFight)
         {
             grid.GetGridObject(character.transform.position).SetObjectInTile(character);
-            Debug.Log(character.name);
-            Debug.Log(grid.GetGridObject(character.transform.position).ToString());
-            Debug.Log(grid.GetGridObject(character.transform.position).GetObjectInCell().name);
             grid.TriggerGridObjectChange(grid.GetGridObject(character.transform.position).x(), grid.GetGridObject(character.transform.position).y());
         }
     }
@@ -112,6 +109,7 @@ public class GridCombatSystem : MonoBehaviour
     {
         onGridReady += OnGridReadyAction;
         if(onGridReady != null) onGridReady();
+
     }
     
     public void OnGridReadyAction()

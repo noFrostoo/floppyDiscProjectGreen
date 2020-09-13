@@ -49,7 +49,7 @@ public class GameCharacter : MonoBehaviour
         actionPointThisRound = actionPoints;
         movmentPointsThisRound = movmentPointsPerRound;
         SetUpHealtText();
-        OnReady.Invoke(this, EventArgs.Empty);
+        OnReady?.Invoke(this, EventArgs.Empty);
     }
 
     void SubscribeToEvents()
