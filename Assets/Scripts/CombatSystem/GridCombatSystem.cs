@@ -10,6 +10,7 @@ namespace CombatSystem
 {
 public class GridCombatSystem : MonoBehaviour
 {
+    public static GridCombatSystem Instance;
     public enum State
     {
         playerRound,
@@ -36,11 +37,7 @@ public class GridCombatSystem : MonoBehaviour
     private GridObject lastPlayerCell;
     List<GridObject> path = null;
     public bool gridRead = false;
-
     [SerializeField] State currentState;
-
-    private bool mouseOutofRadious;
-
     [SerializeField] private bool debug;
     [SerializeField] private  List<Vector2Int> unWalkableCells; 
     private GameObject[] charactersInFight;
@@ -50,6 +47,7 @@ public class GridCombatSystem : MonoBehaviour
 
     void Start()
     {
+        Instance = this;
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
         grid.SetUnwalkable(unWalkableCells);
         pathAndRadiousVisualiation = GetComponent<VisualiationHandler>();
@@ -110,20 +108,17 @@ public class GridCombatSystem : MonoBehaviour
     {
         return currentState;
     }
-    // Update is called once per frame
+
     void Update()
     {
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var currentActiveCell = grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         var playerCell = grid.GetGridObject(player.transform.position);
 
-        // if(lastActiveCell == null) lastActiveCell = currentActiveCell;
-        // if(lastPlayerCell == null) lastPlayerCell = playerCell;
-
         pathAndRadiousVisualiation.ActiveCellVisualization(currentActiveCell);
         if(currentState == State.playerRound)
         {
-            pathAndRadiousVisualiation.HandleRadiousVisualiation(currentActiveCell, playerCell);
+            pathAndRadiousVisualiation.HandlePlayerRadiousVisualiation(currentActiveCell, playerCell);
             HandlePathFindingAndVisualiation(currentActiveCell, playerCell);
             HandleMouseInput(mousePos);
         }

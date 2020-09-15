@@ -8,6 +8,7 @@ namespace CombatSystem
 {
 public class VisualiationHandler : MonoBehaviour
 {
+    public static VisualiationHandler Instance;
     [SerializeField] private GameCharacter player;
     GridComplete grid;
     [SerializeField] private GridCombatSystem gridCombatSystem;
@@ -22,6 +23,7 @@ public class VisualiationHandler : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;
         SetUpPathVisualiation(20);
         SetUpRadiousVisualiation(100);
         gridCombatSystem.onGridReady += SetUp;
@@ -35,11 +37,7 @@ public class VisualiationHandler : MonoBehaviour
         grid = gridCombatSystem.GetGrid();
         
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
     public void SetPlayerAndGrid(GameCharacter player, GridComplete grid)
     {
         this.grid = grid;
@@ -68,7 +66,7 @@ public class VisualiationHandler : MonoBehaviour
         }
     }
 
-    public void HandleRadiousVisualiation(GridObject currentActiveCell, GridObject playerCell)
+    public void HandlePlayerRadiousVisualiation(GridObject currentActiveCell, GridObject playerCell)
     {
         if(!player.CellInRadious(currentActiveCell) && !mouseOutofRadious)
         { 
@@ -149,6 +147,11 @@ public class VisualiationHandler : MonoBehaviour
             activeCellGameObject.transform.position = currentActiveCell.GetCellPos();
             
         }
+    }
+
+    public void VisualizeArea()
+    {
+        
     }
 }
 }
