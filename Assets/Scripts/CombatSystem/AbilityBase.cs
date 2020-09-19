@@ -2,24 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using FloppyDiscProjectGreen.CombatSystem;
 
 namespace FloppyDiscProjectGreen
 {
-namespace CombatSystem
+namespace Abilites
 {
-public class AbilityBase : MonoBehaviour
+public abstract class AbilityBase : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public abstract AbilityType type {get; }
+    public abstract string abilityName {get;}
+    public abstract float coolDown {get;}
+    public abstract Sprite sprite {get; set;}
+    public abstract AudioClip sound {get; set;}
+    public abstract int actionPointsCost {get; set;}
+    public abstract int level {get;}
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public abstract void Init(AbilitesSystem abSystem);
+    public abstract void TrigerAbility(GridObject cell);
+    public abstract void LevelUp();
+
+    public abstract void VisualizeAbility();
+
+    
 }
+
+public enum AbilityType
+{
+    active,
+    flatBounus,
+    pasive,
+} 
+
 }
 }

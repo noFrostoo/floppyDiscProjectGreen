@@ -62,7 +62,8 @@ public class GridObject : IComparable<GridObject>
 
     public void AttactObjectInTile(int damage)
     {
-        objectInTile.GetComponent<GameCharacter>().TakeDamage(damage);
+        if(objectInTile != null)
+            objectInTile.GetComponent<GameCharacter>().TakeDamage(damage);
     }
 
     public override string ToString()

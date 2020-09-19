@@ -38,7 +38,7 @@ public class GridCombatSystem : MonoBehaviour
     List<GridObject> path = null;
     public bool gridRead = false;
     [SerializeField] State currentState;
-    [SerializeField] private bool debug;
+    [SerializeField] static public bool debug;
     [SerializeField] private  List<Vector2Int> unWalkableCells; 
     private GameObject[] charactersInFight;
     private GameObject[] enemies;
