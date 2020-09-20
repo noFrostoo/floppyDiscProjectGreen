@@ -4,6 +4,7 @@ using UnityEngine;
 using FloppyDiscProjectGreen.CombatSystem;
 using TMPro;
 using System;
+using FloppyDiscProjectGreen.Abilites;
 
 namespace FloppyDiscProjectGreen
 {
@@ -27,6 +28,7 @@ public class GameCharacter : MonoBehaviour
     private HealthSystem healthSystem;
     private RangeCombat rangeCombat;
     private StatsSystem statsSystem;
+    private AbilitesSystem abilitesSystem;
     private TextMeshPro healthText; //to DO delete1
     public bool moving; //to do check if it's even used
     [SerializeField] State currentState;
@@ -40,6 +42,7 @@ public class GameCharacter : MonoBehaviour
     {
         currentState = State.Idle;
         statsSystem = GetComponent<StatsSystem>();
+        abilitesSystem = GetComponent<AbilitesSystem>();
         healthSystem = new HealthSystem(statsSystem.Health);
         rangeCombat = new RangeCombat(gameObject.GetComponent<GameCharacter>());
         rangeCombat.ChangeWeapon(new BasicPistol(this));

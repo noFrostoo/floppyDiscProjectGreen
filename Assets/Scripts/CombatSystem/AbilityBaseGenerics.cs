@@ -8,12 +8,7 @@ namespace Abilites
 {
 public abstract class AbilityBaseGenerics<T> : AbilityBase where T : Component
 {
-    public static void AddAbility(GameObject holder)
-    {
-        if(holder.GetComponent<T>() == null)
-            throw new AbilityAlreadyOnCharacter();
-        holder.AddComponent<T>();
-    }
+
 }
 }
 }

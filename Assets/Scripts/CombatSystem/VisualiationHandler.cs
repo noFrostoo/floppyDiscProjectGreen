@@ -33,7 +33,7 @@ public class VisualiationHandler : MonoBehaviour
         Instance = this;
         SetUpVisualiation(20, "Path Cell", ref pathVisualizationPool);
         SetUpVisualiation(100, "Radious Cell", ref radiousVisualizationnPool);
-        SetUpVisualiation(30, "Abilities Cell" ,ref abilitiesVisualizationPool);
+        SetUpVisualiation(100, "Abilities Cell" ,ref abilitiesVisualizationPool);
         gridCombatSystem.onGridReady += SetUp;
         gridCombatSystem.OnPathChanged += HandlePathVisualization;
 
@@ -156,6 +156,7 @@ public class VisualiationHandler : MonoBehaviour
     
     public void VisualizeArea(GridObject center, int radious)
     {
+        if(center == null) return;
         int x = center.x();
         int y = center.y();
         int radiousCost = radious * STRAIGH_MOVE_COST;
@@ -163,8 +164,8 @@ public class VisualiationHandler : MonoBehaviour
         for (int i = -radious-1; i <= radious; i++)
             for (int j = -radious-1 ; j <= radious; j++)
             {
-                GridObject cell = grid.GetGridObject(x + i, y + i);
-                if(cell != null && cell.isWalkable() && CalculateDistance(center, cell) <= radiousCost)
+                GridObject cell = grid.GetGridObject(x + i, y + j);
+                if(cell != null && (cell.isWalkable() || (!cell.isWalkable() && cell.GetObjectInCell() != null)) && CalculateDistance(center, cell) <= radiousCost)
                 {
                     abilitiesVisualizationPool[count].transform.position = cell.GetCellPos();
                     abilitiesVisualizationPool[count].SetActive(true);

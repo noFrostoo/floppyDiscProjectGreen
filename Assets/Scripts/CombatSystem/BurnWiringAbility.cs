@@ -48,7 +48,7 @@ namespace Abilites
 
         public override void Init(AbilitesSystem abSystem)
         {
-            if(GridCombatSystem.debug) _level = 1;
+            if(GridCombatSystem.debugS) _level = 1;
             visualiationHandler = VisualiationHandler.Instance;
             if(abSystem.gameObject.GetComponent<BurnWiringAbility>() == null)
                 throw new AbilityAlreadyOnCharacter();

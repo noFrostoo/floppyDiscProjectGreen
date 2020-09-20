@@ -32,8 +32,12 @@ public class AbilitesSystem : MonoBehaviour
         activeAbilities[index].TrigerAbility(target);
     }
 
-    public void EquipAbility(AbilityBase ability, AbilitesCode code = AbilitesCode.A)
+    public void EquipAbility<T>(AbilitesCode code = AbilitesCode.A) where T : AbilityBase
     {
+       // if(character.GetComponent<T>() != null)
+        //    Debug.Log("wttf");
+        T ability = gameObject.AddComponent<T>();
+        
         ability.Init(this);
         if(ability.type == AbilityType.active)
             activeAbilities[(int)code] = ability;
@@ -41,6 +45,12 @@ public class AbilitesSystem : MonoBehaviour
             pasiveAbilites[(int)code] = ability;
     }
 
+    public void VisualizeAbility(GridObject target, AbilitesCode ability)
+    {
+        int index = (int) ability;
+        activeAbilities[index].VisualizeAbility(target);
+    }
+    
     public bool CheckAbility(AbilityBase ability)
     {
         if(ability.type == AbilityType.active)

@@ -16,7 +16,7 @@ namespace Abilites
         [SerializeField] private Sprite _sprite;
         [SerializeField] private AudioClip _sound;  
         private int _level = 0;
-        private int _damage = 20;
+        private int _damage = 30;
         private int _radious = 3;
         private int _radiousCost = 30;
         private int _actionPointCost = 20;
@@ -52,11 +52,8 @@ namespace Abilites
         }
         public override void Init(AbilitesSystem abSystem)
         {
-            if(GridCombatSystem.debug) _level = 1;
+            if(GridCombatSystem.debugS) _level = 1;
             visualiationHandler = VisualiationHandler.Instance;
-            if(abSystem.gameObject.GetComponent<EmpAbility>() == null)
-                throw new AbilityAlreadyOnCharacter();
-            abSystem.gameObject.AddComponent<EmpAbility>();
         }
 
         public override void LevelUp()
@@ -67,6 +64,7 @@ namespace Abilites
 
         public override void TrigerAbility(GridObject target)
         {
+            EndVisualization();
             GridComplete grid = GridCombatSystem.Instance.GetGrid();
             for(int i = -_radious - 1; i <= _radious; i++)
                 for (int j = -_radious - 1; j <= _radious; j++)
@@ -88,6 +86,7 @@ namespace Abilites
         {
             visualize = false;
         }
+
         private int CalculateDistance(GridObject pn1, GridObject pn2)
         {
             int discX = Math.Abs(pn1.x() - pn2.x());

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FloppyDiscProjectGreen.CombatSystem;
 using System;
 using FloppyDiscProjectGreen.Abilites;
 
@@ -39,17 +38,23 @@ public class GridCombatSystem : MonoBehaviour
     List<GridObject> path = null;
     public bool gridRead = false;
     [SerializeField] State currentState;
-    [SerializeField] static public bool debug;
+
+    [SerializeField] private bool debug;
     [SerializeField] private  List<Vector2Int> unWalkableCells; 
+    static public bool debugS;
     private GameObject[] charactersInFight;
     private GameObject[] enemies;
     private GameCharacter player;
     private AbilitesSystem playerAbilitiesSystem;
     private VisualiationHandler pathAndRadiousVisualiation;
+    
+
+    private bool vis = false; // to help with wit
 
     void Start()
     {
         Instance = this;
+        debugS = debug;
         grid = new GridComplete(10, 20, 1f, new Vector3(-13, -6), debug);
         grid.SetUnwalkable(unWalkableCells);
         pathAndRadiousVisualiation = GetComponent<VisualiationHandler>();
@@ -130,7 +135,10 @@ public class GridCombatSystem : MonoBehaviour
             pathAndRadiousVisualiation.ClearVisualization();
         }
         if(debug) TriggerGridObjectChangeForWholeGrid();
-
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            playerAbilitiesSystem.EquipAbility<EmpAbility>();
+        }
     }
 
     void HandlePathFindingAndVisualiation(GridObject currentActiveCell, GridObject playerCell)
@@ -151,9 +159,17 @@ public class GridCombatSystem : MonoBehaviour
     {
         if(currentState == State.playerRound)
         {
-            if(Input.GetMouseButtonDown(0))
+            if(Input.GetMouseButtonDown(0) && !vis)
+            {
+                playerAbilitiesSystem.VisualizeAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
+                vis = true;
+                Debug.Log("1");
+            }  
+            else if(Input.GetMouseButtonDown(0) && vis)
             {
                 playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
+                vis = false;
+                Debug.Log("2");
             }  
             if(Input.GetMouseButtonDown(1))
             {
