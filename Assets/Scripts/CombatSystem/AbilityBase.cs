@@ -22,8 +22,9 @@ public abstract class AbilityBase : MonoBehaviour
     public abstract void TrigerAbility(GridObject cell);
     public abstract void LevelUp();
 
-    public abstract void VisualizeAbility();
+    public abstract void VisualizeAbility(GridObject target);
 
+    public abstract void EndVisualization();
     
 }
 

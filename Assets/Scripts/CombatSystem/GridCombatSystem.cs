@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using FloppyDiscProjectGreen.CombatSystem;
 using System;
+using FloppyDiscProjectGreen.Abilites;
 
 namespace FloppyDiscProjectGreen
 {
@@ -43,6 +44,7 @@ public class GridCombatSystem : MonoBehaviour
     private GameObject[] charactersInFight;
     private GameObject[] enemies;
     private GameCharacter player;
+    private AbilitesSystem playerAbilitiesSystem;
     private VisualiationHandler pathAndRadiousVisualiation;
 
     void Start()
@@ -72,6 +74,7 @@ public class GridCombatSystem : MonoBehaviour
         activeCellGameObject.SetActive(false);
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<GameCharacter>();
+        playerAbilitiesSystem = player.GetComponent<AbilitesSystem>();
         charactersInFight = GameObject.FindGameObjectsWithTag("Enemy");
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
     }
@@ -150,7 +153,7 @@ public class GridCombatSystem : MonoBehaviour
         {
             if(Input.GetMouseButtonDown(0))
             {
-                player.RangeAttack(grid.GetGridObject(mousePos).GetObjectInCell().GetComponent<GameCharacter>());
+                playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
             }  
             if(Input.GetMouseButtonDown(1))
             {

@@ -23,17 +23,14 @@ public class GameCharacter : MonoBehaviour
     private const int DIAGONAL_MOVE_COST = 14;
     private const int STRAIGH_MOVE_COST = 10;
     [SerializeField] private GridCombatSystem gridCS;
-    [SerializeField] private int health = 100;
+
     private HealthSystem healthSystem;
     private RangeCombat rangeCombat;
-    private TextMeshPro healthText; //to DO delete
+    private StatsSystem statsSystem;
+    private TextMeshPro healthText; //to DO delete1
     public bool moving; //to do check if it's even used
     [SerializeField] State currentState;
-    [SerializeField] private int MeleeAttackRadious = 1; //in cells
-    [SerializeField] private int MeleeDamage = 30;
-    [SerializeField] private int actionPoints = 100;
     public int actionPointThisRound;
-    [SerializeField] public int movmentPointsPerRound = 50;
     int movmentPointsThisRound;
     [SerializeField] private Vector3 healthTextOffset = new Vector3(0, 0.65f, 0);
     [SerializeField] private int healthTextFontSize = 4;
@@ -42,12 +39,13 @@ public class GameCharacter : MonoBehaviour
     void Start()
     {
         currentState = State.Idle;
-        healthSystem = new HealthSystem(health);
+        statsSystem = GetComponent<StatsSystem>();
+        healthSystem = new HealthSystem(statsSystem.Health);
         rangeCombat = new RangeCombat(gameObject.GetComponent<GameCharacter>());
         rangeCombat.ChangeWeapon(new BasicPistol(this));
         SubscribeToEvents();
-        actionPointThisRound = actionPoints;
-        movmentPointsThisRound = movmentPointsPerRound;
+        actionPointThisRound = statsSystem.ActionPoints;
+        movmentPointsThisRound = statsSystem.MovmentPointsPerRound;
         SetUpHealtText();
         OnReady?.Invoke(this, EventArgs.Empty);
     }
@@ -153,14 +151,14 @@ public class GameCharacter : MonoBehaviour
     {
         int discX = Math.Abs(cell.x() - playerCell.x());
         int discY = Math.Abs(cell.y() - playerCell.y());
-        if(discX <= MeleeAttackRadious && discY <= MeleeAttackRadious) return true;
-        if(discX == discY && discX <= MeleeAttackRadious) return true;
+        if(discX <= statsSystem.MeleeAttackRadious && discY <= statsSystem.MeleeAttackRadious) return true;
+        if(discX == discY && discX <= statsSystem.MeleeAttackRadious) return true;
         return false;
     }
   
     public int MaxCellMovmentRadious()
     {
-        return movmentPointsPerRound/STRAIGH_MOVE_COST;
+        return statsSystem.MovmentPointsPerRound/STRAIGH_MOVE_COST;
     }
 
     public void TakeDamage(int amount)
@@ -188,8 +186,8 @@ public class GameCharacter : MonoBehaviour
         if(InMeleeAttackRadious(target.transform.position))
         {
             currentState = State.Attacking;
-            target.TakeDamage(MeleeDamage);
-            OnDoneAttacking.Invoke(this, EventArgs.Empty);
+            target.TakeDamage(statsSystem.MeleeDamge);
+            OnDoneAttacking?.Invoke(this, EventArgs.Empty);
         }
         else
             Debug.Log("Out of Range");
@@ -212,12 +210,12 @@ public class GameCharacter : MonoBehaviour
 
     void NewRound()
     {
-        actionPointThisRound += actionPoints;
-        if(actionPointThisRound > actionPoints)
-            actionPointThisRound = actionPoints;
-        movmentPointsThisRound += movmentPointsPerRound;
-        if(movmentPointsThisRound > movmentPointsPerRound)
-            movmentPointsThisRound = movmentPointsPerRound;
+        actionPointThisRound += statsSystem.ActionPoints;
+        if(actionPointThisRound > statsSystem.ActionPoints)
+            actionPointThisRound = statsSystem.ActionPoints;
+        movmentPointsThisRound += statsSystem.MovmentPointsPerRound;
+        if(movmentPointsThisRound > statsSystem.MovmentPointsPerRound)
+            movmentPointsThisRound = statsSystem.MovmentPointsPerRound;
     }    
 
     void Grid_NewRound(object sender, EventArgs e)
@@ -236,7 +234,7 @@ public class GameCharacter : MonoBehaviour
 
     public int GetActionPoints()
     {
-        return actionPoints;
+        return statsSystem.ActionPoints;
     }
     
     public int GetCurrentActionPoints()
@@ -245,7 +243,7 @@ public class GameCharacter : MonoBehaviour
     }
     public int GetMovmentPoint()
     {
-        return movmentPointsPerRound;
+        return statsSystem.MovmentPointsPerRound;
     }
 
     public int GetMovmentPointThisRound()
@@ -253,18 +251,18 @@ public class GameCharacter : MonoBehaviour
         return movmentPointsThisRound;
     }
 
-    public void DecreaseActionPoints(int amount)
+    public void DecreaseActionPointsThisRound(int amount)
     {
         // if(actionPointThisRound < amount) 
         //     ;
         actionPointThisRound -= amount;
     }
 
-    public void IncreaseActionPoints(int amount)
+    public void IncreaseActionPointsThisRound(int amount)
     {
         actionPointThisRound += amount;
-        if(actionPointThisRound > actionPoints)
-            actionPointThisRound = actionPoints;
+        if(actionPointThisRound > statsSystem.ActionPoints)
+            actionPointThisRound = statsSystem.ActionPoints;
 
     }
    public void StartShooting(int amoutOfShoots, Vector2 lookDirection, GameObject projectile, int waitingTimeBetwennShots)

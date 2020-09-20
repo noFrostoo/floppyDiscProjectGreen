@@ -23,6 +23,7 @@ public class AbilitesSystem : MonoBehaviour
         activeAbilities = new AbilityBase[amountOfActiveAblites];
         pasiveAbilites = new AbilityBase[amountOfPasiveAblites];
         character = GetComponent<GameCharacter>();
+
     }
 
     public void TrigerAbility(GridObject target, AbilitesCode ability)
@@ -84,5 +85,11 @@ public class CanNotCheckForFlatBouns : System.Exception
 {
 
 }
+
+interface Foo 
+{
+    void lol();
+}
+
 }
 }

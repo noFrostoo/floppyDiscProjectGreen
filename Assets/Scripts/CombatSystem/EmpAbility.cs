@@ -8,7 +8,7 @@ namespace FloppyDiscProjectGreen
 {
 namespace Abilites
 {
-    public class BurnWiringAbility : AbilityBaseGenerics<BurnWiringAbility>
+    public class EmpAbility : AbilityBaseGenerics<EmpAbility>
     {
         private const int DIAGONAL_MOVE_COST = 14;
         private const int STRAIGH_MOVE_COST = 10;
@@ -21,11 +21,11 @@ namespace Abilites
         private int _radiousCost = 30;
         private int _actionPointCost = 20;
         private VisualiationHandler visualiationHandler;
-
+        private bool visualize = false;
 
         public override AbilityType type => AbilityType.active;
 
-        public override string abilityName => "Burn Wiring";
+        public override string abilityName => "Emp";
 
         public override float coolDown { get => _coolDown; }
 
@@ -46,13 +46,17 @@ namespace Abilites
         public override int level => _level;
 
 
+        public static void AddAbility()
+        {
+
+        }
         public override void Init(AbilitesSystem abSystem)
         {
             if(GridCombatSystem.debug) _level = 1;
             visualiationHandler = VisualiationHandler.Instance;
-            if(abSystem.gameObject.GetComponent<BurnWiringAbility>() == null)
+            if(abSystem.gameObject.GetComponent<EmpAbility>() == null)
                 throw new AbilityAlreadyOnCharacter();
-            abSystem.gameObject.AddComponent<BurnWiringAbility>();
+            abSystem.gameObject.AddComponent<EmpAbility>();
         }
 
         public override void LevelUp()
@@ -63,25 +67,41 @@ namespace Abilites
 
         public override void TrigerAbility(GridObject target)
         {
-            throw new NotImplementedException();
+            GridComplete grid = GridCombatSystem.Instance.GetGrid();
+            for(int i = -_radious - 1; i <= _radious; i++)
+                for (int j = -_radious - 1; j <= _radious; j++)
+                {
+                    GridObject  cell = grid.GetGridObject(target.x() + i, target.y() + j);
+                    if(cell != null && CalculateDistance(target, cell) <= 30)
+                    {
+                        cell.AttactObjectInTile(_damage);
+                    }
+                }
         }
 
         public override void VisualizeAbility(GridObject target)
         {
-            throw new NotImplementedException();
+            visualize = true;
         }
-
+        
         public override void EndVisualization()
         {
-            throw new NotImplementedException();
+            visualize = false;
         }
-    
         private int CalculateDistance(GridObject pn1, GridObject pn2)
         {
             int discX = Math.Abs(pn1.x() - pn2.x());
             int discY = Math.Abs(pn1.y() - pn2.y());
             int reamaing = Math.Abs(discX - discY);
             return DIAGONAL_MOVE_COST*Math.Min(discX, discY) + STRAIGH_MOVE_COST*reamaing;
+        }
+
+        private void Update() {
+            if(visualize)
+            {
+                Vector3 mousPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                visualiationHandler.VisualizeArea(mousPos, _radious);
+            }    
         }
     }
 }

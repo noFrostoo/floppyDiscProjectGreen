@@ -27,7 +27,7 @@ public class RangeCombat
 
     public void Fire(GameCharacter target)
     {
-        shooter.DecreaseActionPoints(currentWeapon.Fire(target));
+        shooter.DecreaseActionPointsThisRound(currentWeapon.Fire(target));
     }
     
     public void Reload()
