@@ -80,6 +80,7 @@ public class VisualiationHandler : MonoBehaviour
         }
     }
 
+
     void VisualizeRadious(GridObject playerCell)
     {
         int poolingCount = 0;
@@ -148,7 +149,11 @@ public class VisualiationHandler : MonoBehaviour
             
         }
     }
-
+    public void VisualizeArea(Vector3 pos, int radious)
+    {
+        VisualizeArea(grid.GetGridObject(pos), radious);
+    }
+    
     public void VisualizeArea(GridObject center, int radious)
     {
         int x = center.x();
