@@ -19,6 +19,7 @@ public class BasicPistol : IRangeWeaponBase
     int waitingTimeBetwennShots; 
     int currentAmmoInMagazine;
     
+    int chanceOfHit = 0;
     public BasicPistol(GameCharacter shooter)
     {
         this.shooter = shooter;
@@ -26,6 +27,7 @@ public class BasicPistol : IRangeWeaponBase
         if(bulletsMaker == null)
             bulletsMaker = shooter.gameObject.AddComponent<BulletsMaker>();
         projectile = Resources.Load("Prefabs/Projectile") as GameObject;
+        projectile.GetComponent<Bullet>().SetInfomationForBullet(damage, chanceOfHit);
         waitingTimeBetwennShots = fireRate/60;
         currentAmmoInMagazine = 9;
     }

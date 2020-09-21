@@ -166,7 +166,7 @@ public class GameCharacter : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        healthSystem.TakeDamage(amount);
+        healthSystem.TakeDamage(amount/statsSystem.Armour);
     }
 
     private void Death(object sender, EventArgs e)
