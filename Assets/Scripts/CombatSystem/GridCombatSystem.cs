@@ -22,20 +22,14 @@ public class GridCombatSystem : MonoBehaviour
     public event EventHandler OnStateChange;
     public event EventHandler OnPlayerRound;
     public event EventHandler OnEnemyRound;
-    public event EventHandler<OnPathChangedArgs> OnPathChanged;
-    public class OnPathChangedArgs : EventArgs
-    {
-        public List<GridObject> newPath;
-    }
+
 
     private GridComplete grid;
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
 
     private GameObject activeCellGameObject;
-    private GridObject lastActiveCell;
-    private GridObject lastPlayerCell;
-    List<GridObject> path = null;
+    //List<GridObject> path = null;
     public bool gridRead = false;
     [SerializeField] State currentState;
 
@@ -48,9 +42,6 @@ public class GridCombatSystem : MonoBehaviour
     private AbilitesSystem playerAbilitiesSystem;
     private VisualiationHandler pathAndRadiousVisualiation;
     
-
-    private bool vis = false; // to help with wit
-
     void Start()
     {
         Instance = this;
@@ -63,9 +54,6 @@ public class GridCombatSystem : MonoBehaviour
         SetUp();
         UpdateObjectsInCellRefrences();
         SetUpOnGridReady();
-
-        lastActiveCell = grid.GetGridObject(0, 0);
-        lastPlayerCell = grid.GetGridObject(player.transform.position);
     }
 
     void SetUp()
@@ -75,8 +63,6 @@ public class GridCombatSystem : MonoBehaviour
             //updateIdleCell(gridcell);
             //gridcell.setActiveCellSprite(activeCellSprite);
         }
-        activeCellGameObject = Instantiate(activeCellSprite, new Vector3(0,0,0), activeCellSprite.transform.rotation);
-        activeCellGameObject.SetActive(false);
 
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<GameCharacter>();
         playerAbilitiesSystem = player.GetComponent<AbilitesSystem>();
@@ -119,69 +105,9 @@ public class GridCombatSystem : MonoBehaviour
 
     void Update()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        var currentActiveCell = grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-        var playerCell = grid.GetGridObject(player.transform.position);
-
-        pathAndRadiousVisualiation.ActiveCellVisualization(currentActiveCell);
-        if(currentState == State.playerRound)
-        {
-            pathAndRadiousVisualiation.HandlePlayerRadiousVisualiation(currentActiveCell, playerCell);
-            HandlePathFindingAndVisualiation(currentActiveCell, playerCell);
-            HandleMouseInput(mousePos);
-        }
-        else
-        {
-            pathAndRadiousVisualiation.ClearVisualization();
-        }
         if(debug) TriggerGridObjectChangeForWholeGrid();
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            playerAbilitiesSystem.EquipAbility<EmpAbility>();
-        }
     }
 
-    void HandlePathFindingAndVisualiation(GridObject currentActiveCell, GridObject playerCell)
-    {
-        if(lastActiveCell != currentActiveCell || lastPlayerCell != playerCell)
-        {  
-            lastActiveCell = currentActiveCell;
-            lastPlayerCell = playerCell;
-            if(player.CellInRadious(currentActiveCell))
-            {
-                path = grid.FindPath(playerCell, currentActiveCell);
-                OnPathChanged?.Invoke(this, new OnPathChangedArgs{newPath = path});
-            }
-        }
-    }
-
-    void HandleMouseInput(Vector3 mousePos)
-    {
-        if(currentState == State.playerRound)
-        {
-            if(Input.GetMouseButtonDown(0) && !vis)
-            {
-                playerAbilitiesSystem.VisualizeAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
-                vis = true;
-                Debug.Log("1");
-            }  
-            else if(Input.GetMouseButtonDown(0) && vis)
-            {
-                playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
-                vis = false;
-                Debug.Log("2");
-            }  
-            if(Input.GetMouseButtonDown(1))
-            {
-                if(path != null && player.GetState() == GameCharacter.State.Idle)
-                {
-                    grid.GetGridObject(player.transform.position).SetObjectInTile(null);
-                    player.MoveTo(path);
-                    grid.GetGridObject(path[path.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
-                }
-            }
-        }
-    }
 
     private void ChangeState()
     {

@@ -15,6 +15,7 @@ public class VisualiationHandler : MonoBehaviour
     [SerializeField] private GameCharacter player;
     GridComplete grid;
     [SerializeField] private GridCombatSystem gridCombatSystem;
+    [SerializeField] private InputHandler inputHandler;
     private bool mouseOutofRadious;
     public GameObject idleCellSprite;
     public GameObject activeCellSprite;
@@ -35,7 +36,7 @@ public class VisualiationHandler : MonoBehaviour
         SetUpVisualiation(100, "Radious Cell", ref radiousVisualizationnPool);
         SetUpVisualiation(100, "Abilities Cell" ,ref abilitiesVisualizationPool);
         gridCombatSystem.onGridReady += SetUp;
-        gridCombatSystem.OnPathChanged += HandlePathVisualization;
+        inputHandler.OnPlayerPathChanged += HandlePathVisualization;
 
         visualizeCell = Instantiate(activeCellSprite, Vector3.zero, activeCellSprite.transform.rotation);
         visualizeCell.SetActive(false);
@@ -126,7 +127,7 @@ public class VisualiationHandler : MonoBehaviour
         }
     }
 
-    void HandlePathVisualization(object sender, GridCombatSystem.OnPathChangedArgs e)
+    void HandlePathVisualization(object sender, InputHandler.OnPathChangedArgs e)
     {
         ClearVisualizePath();
         VisualizePath(e.newPath);
