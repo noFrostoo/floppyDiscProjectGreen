@@ -11,17 +11,6 @@ public class Bullet : MonoBehaviour
 {
     int damage;
     int baseChanceOfHit;
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy"))
@@ -34,6 +23,7 @@ public class Bullet : MonoBehaviour
         else if(other.gameObject.CompareTag("Wall"))
         {
             baseChanceOfHit -= other.gameObject.GetComponent<Wall>().ChancePointsDecrease;
+            damage -= other.gameObject.GetComponent<Wall>().DamageDecrase;
         }
     }
 

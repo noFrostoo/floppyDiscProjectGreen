@@ -62,7 +62,7 @@ namespace Abilites
             _damage = _level * 20;
         }
 
-        public override void TrigerAbility(GridObject target)
+        public override void TrigerAbility(GridObject target, Action onAtttackEnd)
         {
             EndVisualization();
             GridComplete grid = GridCombatSystem.Instance.GetGrid();
@@ -75,6 +75,7 @@ namespace Abilites
                         cell.AttactObjectInTile(_damage);
                     }
                 }
+            onAtttackEnd();
         }
 
         public override void VisualizeAbility(GridObject target)

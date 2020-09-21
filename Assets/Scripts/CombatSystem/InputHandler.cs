@@ -21,7 +21,7 @@ public class InputHandler : MonoBehaviour
     private GridObject lastActiveCell;
     private GridObject lastPlayerCell;
 
-    private bool vis = false; // to help with wit
+    private bool ablityiVisualation = false; // to help with wit
 
     List<GridObject> playerPath;
     // Start is called before the first frame update
@@ -80,16 +80,16 @@ public class InputHandler : MonoBehaviour
     {
         if(gridCombatSystem.GetState() == GridCombatSystem.State.playerRound)
         {
-            if(Input.GetMouseButtonDown(0) && !vis)
+            if(Input.GetMouseButtonDown(0) && !ablityiVisualation)
             {
                 playerAbilitiesSystem.VisualizeAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
-                vis = true;
+                ablityiVisualation = true;
                 Debug.Log("1");
             }  
-            else if(Input.GetMouseButtonDown(0) && vis)
+            else if(Input.GetMouseButtonDown(0) && ablityiVisualation)
             {
-                playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
-                vis = false;
+                playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A, () => {});
+                ablityiVisualation = false;
                 Debug.Log("2");
             }  
             if(Input.GetMouseButtonDown(1))

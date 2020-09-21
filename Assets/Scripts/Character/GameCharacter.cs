@@ -196,16 +196,16 @@ public class GameCharacter : MonoBehaviour
             Debug.Log("Out of Range");
     }
 
-    public void RangeAttack(GameCharacter target)
+    public void  StartAttack()
     {
         currentState = State.Attacking;
-        rangeCombat.Fire(target);
     }
 
-    public void ReloadMagazine()
+    public void AttackDone()
     {
-        rangeCombat.Reload();
+        OnDoneAttacking?.Invoke(this, EventArgs.Empty);
     }
+
     public State GetState()
     {
         return currentState;

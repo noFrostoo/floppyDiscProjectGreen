@@ -9,9 +9,12 @@ public class Player : MonoBehaviour
     public static GameCharacter GameCharacter;
     public static AbilitesSystem Abilites;
     public static StatsSystem Stats;
+    public static Player Instance;
+
     // Start is called before the first frame update
     void Start()
     {
+        Instance = this;    
         GameCharacter = GetComponent<GameCharacter>();
         Abilites = GetComponent<AbilitesSystem>();
         Stats = GetComponent<StatsSystem>();

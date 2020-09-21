@@ -61,7 +61,7 @@ namespace Abilites
             _damage = _level * 20;
         }
 
-        public override void TrigerAbility(GridObject target)
+        public override void TrigerAbility(GridObject target, Action onEndAttack)
         {
             throw new NotImplementedException();
         }

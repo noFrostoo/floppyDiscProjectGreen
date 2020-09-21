@@ -26,10 +26,15 @@ public class AbilitesSystem : MonoBehaviour
 
     }
 
-    public void TrigerAbility(GridObject target, AbilitesCode ability)
+    public void TrigerAbility(GridObject target, AbilitesCode ability, Action onEndAttack)
     {
+        Action newOnAttackEnd = () => {
+            onEndAttack();
+            character.AttackDone();
+        };
+        character.StartAttack();
         int index = (int) ability;
-        activeAbilities[index].TrigerAbility(target);
+        activeAbilities[index].TrigerAbility(target, newOnAttackEnd);
     }
 
     public void EquipAbility<T>(AbilitesCode code = AbilitesCode.A) where T : AbilityBase
@@ -94,11 +99,6 @@ public class AbilityAlreadyOnCharacter : System.Exception
 public class CanNotCheckForFlatBouns : System.Exception
 {
 
-}
-
-interface Foo 
-{
-    void lol();
 }
 
 }

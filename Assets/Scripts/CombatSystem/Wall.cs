@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Wall : MonoBehaviour
 {
-    private int _chancePointsDecrease;
+    [SerializeField] private int _chancePointsDecrease;
+    [SerializeField] private int _damageDecrease;
     public int ChancePointsDecrease{ get => _chancePointsDecrease;}
+    public int DamageDecrase {get => _damageDecrease;}
     // Start is called before the first frame update
     void Start()
     {

@@ -19,7 +19,7 @@ public abstract class AbilityBase : MonoBehaviour
     public abstract int level {get;}
 
     public abstract void Init(AbilitesSystem abSystem);
-    public abstract void TrigerAbility(GridObject cell);
+    public abstract void TrigerAbility(GridObject cell, Action onEndAttack);
     public abstract void LevelUp();
 
     public abstract void VisualizeAbility(GridObject target);
