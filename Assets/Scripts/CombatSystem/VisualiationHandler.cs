@@ -183,6 +183,11 @@ public class VisualiationHandler : MonoBehaviour
         }
     }
 
+    public void VisualiseCell(Vector3 pos)
+    {
+        VisualiseCell(grid.GetGridObject(pos));
+    }
+    
     public void VisualiseCell(GridObject cell)
     {
         visualizeCell.SetActive(true);

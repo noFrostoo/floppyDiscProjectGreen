@@ -45,11 +45,6 @@ namespace Abilites
 
         public override int level => _level;
 
-
-        public static void AddAbility()
-        {
-
-        }
         public override void Init(AbilitesSystem abSystem)
         {
             if(GridCombatSystem.debugS) _level = 1;
@@ -86,6 +81,7 @@ namespace Abilites
         public override void EndVisualization()
         {
             visualize = false;
+            visualiationHandler.ClearVisualizeArea();
         }
 
         private int CalculateDistance(GridObject pn1, GridObject pn2)

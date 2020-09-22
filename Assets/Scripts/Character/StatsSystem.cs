@@ -13,7 +13,8 @@ public class StatsSystem : MonoBehaviour
     [SerializeField] int _health = 100;
     [SerializeField] int _actionPoints = 100;
     [SerializeField] int _movmentPointsPerRound = 50;
-    
+    [SerializeField] int _accuracy = 70;
+     
     public int Charisma { get => _charisma; set {
         if(value >= 0)
             _charisma = value;
@@ -54,5 +55,10 @@ public class StatsSystem : MonoBehaviour
     public int MovmentPointsPerRound{ get => _movmentPointsPerRound; set{
         if(value >= 0)
             _movmentPointsPerRound = value;
+    }}
+
+    public int Accuracy { get => _accuracy; set{
+        if(value >= 0)
+            _accuracy = value;
     }}
 }

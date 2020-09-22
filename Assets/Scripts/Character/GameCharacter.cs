@@ -166,6 +166,7 @@ public class GameCharacter : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if(statsSystem.Armour == 0) statsSystem.Armour = 1;
         healthSystem.TakeDamage(amount/statsSystem.Armour);
     }
 

@@ -35,6 +35,7 @@ public class AbilitesSystem : MonoBehaviour
         character.StartAttack();
         int index = (int) ability;
         activeAbilities[index].TrigerAbility(target, newOnAttackEnd);
+        character.DecreaseActionPointsThisRound(activeAbilities[index].actionPointsCost);
     }
 
     public void EquipAbility<T>(AbilitesCode code = AbilitesCode.A) where T : AbilityBase

@@ -17,19 +17,21 @@ public class BasicPistol : IRangeWeaponBase
     int magazine = 9;
     int burstAmountOfShoots = 3;
     int waitingTimeBetwennShots; 
-    int currentAmmoInMagazine;
-    
+    int currentAmmoInMagazine = 9;
+    int chanceOfHitBouns = 20;
     int chanceOfHit = 0;
-    public BasicPistol(GameCharacter shooter)
+    
+    public BasicPistol(GameCharacter shooter, int ammoInMagazine = 9)
     {
         this.shooter = shooter;
         bulletsMaker = shooter.GetComponent<BulletsMaker>();
+        chanceOfHit = chanceOfHitBouns + shooter.gameObject.GetComponent<StatsSystem>().Accuracy;
         if(bulletsMaker == null)
             bulletsMaker = shooter.gameObject.AddComponent<BulletsMaker>();
         projectile = Resources.Load("Prefabs/Projectile") as GameObject;
         projectile.GetComponent<Bullet>().SetInfomationForBullet(damage, chanceOfHit);
         waitingTimeBetwennShots = fireRate/60;
-        currentAmmoInMagazine = 9;
+        currentAmmoInMagazine = ammoInMagazine;
     }
 
     public void ChangeFireMode(FireMode fireMode)

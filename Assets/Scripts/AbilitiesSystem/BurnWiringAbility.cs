@@ -22,6 +22,7 @@ namespace Abilites
         private int _actionPointCost = 20;
         private VisualiationHandler visualiationHandler;
 
+        private bool visualiation = false;
 
         public override AbilityType type => AbilityType.active;
 
@@ -50,9 +51,6 @@ namespace Abilites
         {
             if(GridCombatSystem.debugS) _level = 1;
             visualiationHandler = VisualiationHandler.Instance;
-            if(abSystem.gameObject.GetComponent<BurnWiringAbility>() == null)
-                throw new AbilityAlreadyOnCharacter();
-            abSystem.gameObject.AddComponent<BurnWiringAbility>();
         }
 
         public override void LevelUp()
@@ -63,25 +61,23 @@ namespace Abilites
 
         public override void TrigerAbility(GridObject target, Action onEndAttack)
         {
-            throw new NotImplementedException();
+            EndVisualization();
+            target.AttactObjectInTile(_damage);
+            onEndAttack();
         }
 
         public override void VisualizeAbility(GridObject target)
         {
-            throw new NotImplementedException();
+            visualiation = true;
         }
 
         public override void EndVisualization()
         {
-            throw new NotImplementedException();
+            visualiation = false;
         }
-    
-        private int CalculateDistance(GridObject pn1, GridObject pn2)
-        {
-            int discX = Math.Abs(pn1.x() - pn2.x());
-            int discY = Math.Abs(pn1.y() - pn2.y());
-            int reamaing = Math.Abs(discX - discY);
-            return DIAGONAL_MOVE_COST*Math.Min(discX, discY) + STRAIGH_MOVE_COST*reamaing;
+
+        private void Update() {
+            visualiationHandler.VisualiseCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         }
     }
 }
