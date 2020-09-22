@@ -14,15 +14,18 @@ public class InputHandler : MonoBehaviour
     }
     private GridComplete grid;
     [SerializeField] private GameCharacter player;
+ 
     [SerializeField] private AbilitesSystem  playerAbilitiesSystem;
     [SerializeField] private VisualiationHandler pathAndRadiousVisualiation;
-    [SerializeField]private GridCombatSystem gridCombatSystem;
-
+    [SerializeField] private GridCombatSystem gridCombatSystem;
+    private RangeCombat rangeCombatPlayer;
+    
     private GridObject lastActiveCell;
     private GridObject lastPlayerCell;
 
+    private Action actionToTakeOnMouseClik = null;
     private bool ablityiVisualation = false; // to help with wit
-
+    Vector3 mousePos;
     List<GridObject> playerPath;
     // Start is called before the first frame update
     void Start()
@@ -37,11 +40,12 @@ public class InputHandler : MonoBehaviour
         grid = gridCombatSystem.GetGrid();
         lastActiveCell = grid.GetGridObject(0, 0);
         lastPlayerCell = grid.GetGridObject(player.transform.position);
+        rangeCombatPlayer = player.rangeCombat;
     }
 
  void Update()
     {
-        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         var currentActiveCell = grid.GetGridObject(Camera.main.ScreenToWorldPoint(Input.mousePosition));
         var playerCell = grid.GetGridObject(player.transform.position);
 
@@ -59,6 +63,7 @@ public class InputHandler : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.E))
         {
             playerAbilitiesSystem.EquipAbility<EmpAbility>();
+            playerAbilitiesSystem.EquipAbility<BurnWiringAbility>(AbilitesCode.B);
         }
     }
 
@@ -80,18 +85,17 @@ public class InputHandler : MonoBehaviour
     {
         if(gridCombatSystem.GetState() == GridCombatSystem.State.playerRound)
         {
-            if(Input.GetMouseButtonDown(0) && !ablityiVisualation)
+            if(Input.GetMouseButtonDown(0))
             {
-                playerAbilitiesSystem.VisualizeAbility(grid.GetGridObject(mousePos), AbilitesCode.A);
-                ablityiVisualation = true;
-                Debug.Log("1");
-            }  
-            else if(Input.GetMouseButtonDown(0) && ablityiVisualation)
-            {
-                playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A, () => {});
-                ablityiVisualation = false;
-                Debug.Log("2");
-            }  
+                if(actionToTakeOnMouseClik != null)
+                {
+                    actionToTakeOnMouseClik();
+                    actionToTakeOnMouseClik = null;   
+                }   else
+                {
+                    Debug.Log("NO ACTION SELECTED");
+                }
+            }
             if(Input.GetMouseButtonDown(1))
             {
                 if(playerPath != null && player.GetState() == GameCharacter.State.Idle)
@@ -101,6 +105,86 @@ public class InputHandler : MonoBehaviour
                     grid.GetGridObject(playerPath[playerPath.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
                 }
             }
+            if(Input.GetKeyDown(KeyCode.E))
+            {
+                playerAbilitiesSystem.EquipAbility<EmpAbility>();
+                playerAbilitiesSystem.EquipAbility<BurnWiringAbility>(AbilitesCode.B);
+            }
         }
+    }
+
+    public void SetMeleeAttack()
+    {
+        actionToTakeOnMouseClik = MeleeAttack;
+    }
+    void MeleeAttack()
+    {
+        player.MeleeAttack(grid.GetGridObject(mousePos));
+    }
+
+    public void SetRangeAttack()
+    {
+        actionToTakeOnMouseClik = RangeAttack;
+    }
+
+    void RangeAttack()
+    {
+        rangeCombatPlayer.Fire(grid.GetGridObject(mousePos).GetObjectInCell().GetComponent<GameCharacter>());
+    }
+
+    void SetAbility(Action action, AbilitesCode code)
+    {
+        actionToTakeOnMouseClik = action;
+        playerAbilitiesSystem.VisualizeAbility(grid.GetGridObject(mousePos), code);
+    }
+
+    public void SetAbilityA()
+    {
+        SetAbility(AbilityA, AbilitesCode.A);
+    }
+
+    public void SetAbilityB()
+    {
+        SetAbility(AbilityB, AbilitesCode.B);
+    }
+
+    public void SetAbilityC()
+    {
+        SetAbility(AbilityC, AbilitesCode.C);
+    }
+
+    public void SetAbilityD()
+    {
+        SetAbility(AbilityD, AbilitesCode.D);
+    }
+
+    public void SetAbilityE()
+    {
+        SetAbility(AbilityE, AbilitesCode.E);
+    }
+
+    void AbilityA()
+    {
+        playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.A, () => {});
+    }
+
+    void AbilityB()
+    {
+        playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.B, () => {});
+    }
+
+    void AbilityC()
+    {
+        playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.C, () => {});
+    }
+
+    void AbilityD()
+    {
+        playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.D, () => {});
+    }
+
+    void AbilityE()
+    {
+        playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.E, () => {});
     }
 }

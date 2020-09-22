@@ -25,8 +25,8 @@ public class GameCharacter : MonoBehaviour
     private const int STRAIGH_MOVE_COST = 10;
     [SerializeField] private GridCombatSystem gridCS;
 
-    private HealthSystem healthSystem;
-    private RangeCombat rangeCombat;
+    public HealthSystem healthSystem;
+    public RangeCombat rangeCombat;
     private StatsSystem statsSystem;
     private AbilitesSystem abilitesSystem;
     private TextMeshPro healthText; //to DO delete1

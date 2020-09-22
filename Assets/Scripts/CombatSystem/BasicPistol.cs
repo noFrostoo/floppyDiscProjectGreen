@@ -19,13 +19,12 @@ public class BasicPistol : IRangeWeaponBase
     int waitingTimeBetwennShots; 
     int currentAmmoInMagazine = 9;
     int chanceOfHitBouns = 20;
-    int chanceOfHit = 0;
     
     public BasicPistol(GameCharacter shooter, int ammoInMagazine = 9)
     {
         this.shooter = shooter;
         bulletsMaker = shooter.GetComponent<BulletsMaker>();
-        chanceOfHit = chanceOfHitBouns + shooter.gameObject.GetComponent<StatsSystem>().Accuracy;
+        int chanceOfHit = chanceOfHitBouns + shooter.gameObject.GetComponent<StatsSystem>().Accuracy;
         if(bulletsMaker == null)
             bulletsMaker = shooter.gameObject.AddComponent<BulletsMaker>();
         projectile = Resources.Load("Prefabs/Projectile") as GameObject;
@@ -41,6 +40,8 @@ public class BasicPistol : IRangeWeaponBase
 
     public int Fire(GameCharacter target)
     {
+        int chanceOfHit = chanceOfHitBouns + shooter.gameObject.GetComponent<StatsSystem>().Accuracy;
+        projectile.GetComponent<Bullet>().SetInfomationForBullet(damage, chanceOfHit);
         if(shooter == null) throw new NoShooterSetException();
         if(target == null) throw new NullTargetException();
         if(currentAmmoInMagazine == 0) throw new NoAmmoInMag();

@@ -27,6 +27,7 @@ public class RangeCombat
 
     public void Fire(GameCharacter target)
     {
+        if(target == null) return;
         shooter.DecreaseActionPointsThisRound(currentWeapon.Fire(target));
     }
     

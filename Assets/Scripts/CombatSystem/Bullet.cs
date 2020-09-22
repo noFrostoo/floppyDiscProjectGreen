@@ -9,14 +9,17 @@ namespace CombatSystem
 {
 public class Bullet : MonoBehaviour
 {
-    int damage;
-    int baseChanceOfHit;
+    static int damage;
+    static int baseChanceOfHit;
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy"))
         {
+            Debug.Log("Base chance");
+            Debug.Log(baseChanceOfHit);
             Destroy(gameObject);
             int hitNumber = Random.Range(0, 101);
+            Debug.Log(hitNumber);
             if( hitNumber < baseChanceOfHit)
                 other.gameObject.GetComponent<GameCharacter>().TakeDamage(damage);
         }
@@ -27,10 +30,11 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    public void SetInfomationForBullet(int damage, int baseChanceOfHit)
+    public void SetInfomationForBullet(int damageG, int baseChanceOfHitG)
     {
-        this.damage = damage;
-        this.baseChanceOfHit = baseChanceOfHit;
+        damage = damageG;
+        baseChanceOfHit = baseChanceOfHitG;
+        Debug.Log("kurwa");
     }
 }
 }
