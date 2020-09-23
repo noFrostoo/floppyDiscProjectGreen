@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using FloppyDiscProjectGreen.CombatSystem;
 using FloppyDiscProjectGreen.Abilites;
+using System;
 
 public class Player : MonoBehaviour
 {
+    [SerializeField] GridCombatSystem gridCombatSystem;
     public static GameCharacter GameCharacter;
     public static AbilitesSystem Abilites;
     public static StatsSystem Stats;
@@ -18,6 +20,7 @@ public class Player : MonoBehaviour
         GameCharacter = GetComponent<GameCharacter>();
         Abilites = GetComponent<AbilitesSystem>();
         Stats = GetComponent<StatsSystem>();
+        gridCombatSystem.OnPlayerRound += Grid_PlayerNewRound;
     }
 
     // Update is called once per frame
@@ -25,4 +28,9 @@ public class Player : MonoBehaviour
     {
          
     }
+
+    void Grid_PlayerNewRound(object sender, EventArgs e)
+    {
+        GameCharacter.NewRound();
+    } 
 }

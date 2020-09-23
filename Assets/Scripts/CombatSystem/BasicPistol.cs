@@ -12,8 +12,9 @@ public class BasicPistol : IRangeWeaponBase
     GameObject projectile;
     GameCharacter shooter;
     BulletsMaker bulletsMaker;
+    int oneShotActionPointsCost = 10;
     int damage = 10;
-    int fireRate = 20;
+    int fireRate = 180;
     int magazine = 9;
     int burstAmountOfShoots = 3;
     int waitingTimeBetwennShots; 
@@ -29,7 +30,7 @@ public class BasicPistol : IRangeWeaponBase
             bulletsMaker = shooter.gameObject.AddComponent<BulletsMaker>();
         projectile = Resources.Load("Prefabs/Projectile") as GameObject;
         projectile.GetComponent<Bullet>().SetInfomationForBullet(damage, chanceOfHit);
-        waitingTimeBetwennShots = fireRate/60;
+        waitingTimeBetwennShots = 60/fireRate;
         currentAmmoInMagazine = ammoInMagazine;
     }
 
@@ -63,31 +64,32 @@ public class BasicPistol : IRangeWeaponBase
     private int FireAutomatic(GameCharacter target)
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
-        int amoutOfShoots = shooter.GetActionPoints()/damage;
-        if(amoutOfShoots < currentAmmoInMagazine)
+        int amoutOfShoots = (int)Mathf.Floor(shooter.GetCurrentActionPoints()/oneShotActionPointsCost);
+        if(amoutOfShoots > currentAmmoInMagazine)
             amoutOfShoots = currentAmmoInMagazine;
         currentAmmoInMagazine -= amoutOfShoots;
+        int cost = (int)Mathf.Floor((amoutOfShoots*oneShotActionPointsCost) * 0.9f);
         shooter.StartShooting(amoutOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
-        return amoutOfShoots*damage;
+        return cost;
     }
 
     private int FireBurst(GameCharacter target)
     {
         Vector2 lookDirection = target.transform.position - shooter.transform.position;
-        int amoutOfShoots = shooter.GetActionPoints()/damage;
-        if(amoutOfShoots < currentAmmoInMagazine)
+        int amoutOfShoots = shooter.GetCurrentActionPoints()/damage;
+        if(amoutOfShoots > currentAmmoInMagazine)
             amoutOfShoots = currentAmmoInMagazine;
         if(amoutOfShoots < burstAmountOfShoots)
         {
             currentAmmoInMagazine -= amoutOfShoots;
             shooter.StartShooting(amoutOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
-            return amoutOfShoots*damage;
+            return (int)Mathf.Floor((amoutOfShoots*oneShotActionPointsCost) * 0.9f);
         }
         else
         {
             currentAmmoInMagazine -= burstAmountOfShoots;
             shooter.StartShooting(burstAmountOfShoots, lookDirection, projectile, waitingTimeBetwennShots);
-            return burstAmountOfShoots*damage;
+            return (int)Mathf.Floor((burstAmountOfShoots*oneShotActionPointsCost) * 0.9f);
         }    
     }
 
@@ -136,5 +138,14 @@ public class BasicPistol : IRangeWeaponBase
         this.shooter = shooter;
     }
 
+    public void SetFireMode(FireMode fireMode)
+    {
+        this.fireMode = fireMode;
+    }
+
+    public FireMode GetFireMode()
+    {
+        return fireMode;
+    }
 }
 }}

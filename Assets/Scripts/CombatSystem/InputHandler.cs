@@ -60,11 +60,7 @@ public class InputHandler : MonoBehaviour
         {
             pathAndRadiousVisualiation.ClearVisualization();
         }
-        if(Input.GetKeyDown(KeyCode.E))
-        {
-            playerAbilitiesSystem.EquipAbility<EmpAbility>();
-            playerAbilitiesSystem.EquipAbility<BurnWiringAbility>(AbilitesCode.B);
-        }
+        DebugInput();
     }
 
     void HandlePathFindingAndVisualiation(GridObject currentActiveCell, GridObject playerCell)
@@ -104,11 +100,6 @@ public class InputHandler : MonoBehaviour
                     player.MoveTo(playerPath);
                     grid.GetGridObject(playerPath[playerPath.Count-1].GetCellPos()).SetObjectInTile(player.gameObject);
                 }
-            }
-            if(Input.GetKeyDown(KeyCode.E))
-            {
-                playerAbilitiesSystem.EquipAbility<EmpAbility>();
-                playerAbilitiesSystem.EquipAbility<BurnWiringAbility>(AbilitesCode.B);
             }
         }
     }
@@ -186,5 +177,40 @@ public class InputHandler : MonoBehaviour
     void AbilityE()
     {
         playerAbilitiesSystem.TrigerAbility(grid.GetGridObject(mousePos), AbilitesCode.E, () => {});
+    }
+
+    public void CycleFireMode()
+    {
+        switch(rangeCombatPlayer.GetCurrentWeapon().GetFireMode())
+        {
+            case FireMode.Semi_Automatic:
+                rangeCombatPlayer.ChangeFireMode(FireMode.Burst);
+                break;
+            case FireMode.Burst:
+                rangeCombatPlayer.ChangeFireMode(FireMode.Automatic);
+                break;
+            case FireMode.Automatic:
+                rangeCombatPlayer.ChangeFireMode(FireMode.Semi_Automatic);
+                break;
+            case FireMode.Custom:
+                // to do
+                break;
+            default:
+                //toDO
+                break;
+        }
+    }
+
+    void DebugInput()
+    {
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            playerAbilitiesSystem.EquipAbility<EmpAbility>();
+            playerAbilitiesSystem.EquipAbility<BurnWiringAbility>(AbilitesCode.B);
+        }
+        if(Input.GetKeyDown(KeyCode.R))
+        {
+            gridCombatSystem.TriggerStateChange();
+        }
     }
 }

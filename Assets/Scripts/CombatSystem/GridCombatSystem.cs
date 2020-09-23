@@ -109,16 +109,7 @@ public class GridCombatSystem : MonoBehaviour
     }
 
 
-    private void ChangeState()
-    {
-        if(currentState == State.playerRound)
-        {
-            currentState = State.enemyRound;
-        }else if(currentState == State.enemyRound)
-        {
-            currentState = State.playerRound;
-        }
-    } 
+
 
     public void TriggerGridObjectChangeForWholeGrid()
     {
@@ -135,6 +126,19 @@ public class GridCombatSystem : MonoBehaviour
         OnStateChange?.Invoke(this, EventArgs.Empty);
     }
     
+    private void ChangeState()
+    {
+        if(currentState == State.playerRound)
+        {
+            currentState = State.enemyRound;
+            Debug.Log("WTF1");
+        }else if(currentState == State.enemyRound)
+        {
+            currentState = State.playerRound;
+            Debug.Log("WTF2");
+        }
+    } 
+
     void HandleStateChange(object sender, EventArgs e)
     {
         if(currentState == State.enemyRound)

@@ -24,6 +24,8 @@ public class UIManager : MonoBehaviour
         player.OnDoneAttacking += UpdateAPText;
         player.OnReady += UpdateAll;
         gridCombatSystem.OnStateChange += UpdateButton;
+        gridCombatSystem.OnPlayerRound += UpdateAPText;
+        gridCombatSystem.OnPlayerRound += UpdateMovmentPointsText;
     }
 
     // Update is called once per frame

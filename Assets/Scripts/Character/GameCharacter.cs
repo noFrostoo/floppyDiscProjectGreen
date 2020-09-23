@@ -21,6 +21,8 @@ public class GameCharacter : MonoBehaviour
     public event EventHandler OnDoneMoving;
     public event EventHandler OnDoneAttacking;
     public event EventHandler OnReady;
+    public event EventHandler onActionPointsChanged;
+    public event EventHandler onMovementPointsChanged;
     private const int DIAGONAL_MOVE_COST = 14;
     private const int STRAIGH_MOVE_COST = 10;
     [SerializeField] private GridCombatSystem gridCS;
@@ -59,7 +61,6 @@ public class GameCharacter : MonoBehaviour
         OnDoneMoving += DoneMoving;
         OnDoneAttacking += DoneAttacking;
         gridCS.onGridReady += SnapToCell;
-        gridCS.OnPlayerRound += Grid_NewRound;
     }
     // Update is called once per frame
     void Update()
@@ -109,6 +110,8 @@ public class GameCharacter : MonoBehaviour
             currentState = State.Moving;
             StartCoroutine(followPath(path));
         }
+        onMovementPointsChanged?.Invoke(this, EventArgs.Empty);
+        onActionPointsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     private int CalculateDistance(GridObject pn1, GridObject pn2)
@@ -192,6 +195,7 @@ public class GameCharacter : MonoBehaviour
             currentState = State.Attacking;
             target.TakeDamage(statsSystem.MeleeDamge);
             OnDoneAttacking?.Invoke(this, EventArgs.Empty);
+            onActionPointsChanged?.Invoke(this, EventArgs.Empty);
         }
         else
             Debug.Log("Out of Range");
@@ -212,8 +216,9 @@ public class GameCharacter : MonoBehaviour
         return currentState;
     }
 
-    void NewRound()
+    public void NewRound()
     {
+        Debug.Log("Wtfff00");
         actionPointThisRound += statsSystem.ActionPoints;
         if(actionPointThisRound > statsSystem.ActionPoints)
             actionPointThisRound = statsSystem.ActionPoints;
@@ -222,10 +227,7 @@ public class GameCharacter : MonoBehaviour
             movmentPointsThisRound = statsSystem.MovmentPointsPerRound;
     }    
 
-    void Grid_NewRound(object sender, EventArgs e)
-    {
-        NewRound();
-    } 
+
     private void DoneMoving(object sender, EventArgs e)
     {
         currentState = State.Idle;

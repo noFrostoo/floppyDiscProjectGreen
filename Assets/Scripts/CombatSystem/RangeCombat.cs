@@ -54,6 +54,10 @@ public class RangeCombat
         currentWeapon = weapon;
     }
 
+    public void ChangeFireMode(FireMode newFireMode)
+    {
+        currentWeapon.SetFireMode(newFireMode);
+    }
 }
 }
 }

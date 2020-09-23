@@ -21,10 +21,14 @@ public interface IRangeWeaponBase
 
     int GetCurrentAmmoInMagazine();
 
+    FireMode GetFireMode();
+
     GameObject GetProjectile();
 
     void ChangeFireMode(FireMode @enum);
     void SetShooter(GameCharacter shooter);
+
+    void SetFireMode(FireMode fireMode);
 
 }
 

@@ -15,11 +15,8 @@ public class Bullet : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D other) {
         if(other.gameObject.CompareTag("Enemy"))
         {
-            Debug.Log("Base chance");
-            Debug.Log(baseChanceOfHit);
             Destroy(gameObject);
             int hitNumber = Random.Range(0, 101);
-            Debug.Log(hitNumber);
             if( hitNumber < baseChanceOfHit)
                 other.gameObject.GetComponent<GameCharacter>().TakeDamage(damage);
         }
@@ -34,7 +31,6 @@ public class Bullet : MonoBehaviour
     {
         damage = damageG;
         baseChanceOfHit = baseChanceOfHitG;
-        Debug.Log("kurwa");
     }
 }
 }

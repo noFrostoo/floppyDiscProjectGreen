@@ -6,7 +6,6 @@ public class StatsSystem : MonoBehaviour
 {
     [SerializeField] int _strength;
     [SerializeField] int _armour;
-    [SerializeField] int _stealth;
     [SerializeField] int _charisma;
     [SerializeField] int _MeleeAttackRadious = 1; //in cells
     [SerializeField] int _MeleeDamage = 30;
@@ -30,12 +29,7 @@ public class StatsSystem : MonoBehaviour
             _armour = value;
     }}
 
-    public int Stealth { get => _stealth; set {
-        if(value >= 0)
-            _stealth = value;
-    }}
-
-    public int MeleeDamge{ get => _stealth + _MeleeDamage; set{
+    public int MeleeDamge{ get => _strength + _MeleeDamage; set{
         if(value >= 0)
             _MeleeDamage = value;
     }}
